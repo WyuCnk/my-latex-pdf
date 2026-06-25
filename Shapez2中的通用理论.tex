@@ -1,0 +1,1146 @@
+% !TeX program = xelatex
+\documentclass[UTF8,fontset=none]{ctexart}
+
+% 字体设置
+\usepackage{fontspec}
+
+\setCJKmainfont{Noto Serif CJK SC}
+\setCJKsansfont{Noto Sans CJK SC}
+\setCJKmonofont{Noto Sans Mono CJK SC}
+
+% 数学与定理环境
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+% TikZ
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, calc}
+
+\tikzset{
+	val/.style={draw, circle, minimum size=0.6cm},       % 值节点
+	fun/.style={draw, rectangle, minimum size=0.6cm}     % 函数节点
+}
+
+% 超链接与智能引用
+\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+\usepackage{cleveref}
+
+% 定理环境
+\newtheoremstyle{cnthm}
+{0.5\baselineskip}
+{0.5\baselineskip}
+{\normalfont}
+{0pt}
+{\bfseries}
+{。}
+{0.5em}
+{\thmname{#1}\thmnumber{ #2}\thmnote{（#3）}}
+
+\theoremstyle{cnthm}
+\newtheorem{definition}{定义}[section]
+\newtheorem{proposition}{命题}[section]
+\newtheorem{theorem}{定理}[section]
+\newtheorem{lemma}{引理}[section]
+\newtheorem{corollary}{推论}[section]
+
+% 设置 cref 环境名为中文
+\crefname{theorem}{定理}{定理}
+\crefname{definition}{定义}{定义}
+\crefname{proposition}{命题}{命题}
+\crefname{lemma}{引理}{引理}
+\crefname{corollary}{推论}{推论}
+\crefname{equation}{式}{式}
+\crefname{figure}{图}{图}
+\crefname{table}{表}{表}
+%opening
+\title{Shapez2中的通用理论}
+\author{悠木受}
+
+\begin{document}
+	
+	\maketitle
+	
+	\begin{abstract}
+		
+		
+		
+	\end{abstract}
+	
+	\tableofcontents
+	
+	\section{基础定义}
+		
+		本章在游戏底层代码逻辑的基础上进行抽象，给出游戏机制的符号定义和命题。
+		
+		\subsection{块与图形}
+	
+			\begin{definition}[块]
+				记
+				$$
+				\mathbb{T}_{\mathrm{blk}}
+				=
+				\{-,P,c\}\cup \mathbb{T}
+				$$
+				为所有块类型构成的集合，其中$\mathbb{T}$为所有可能存在的实体类型的集合
+				（例如$C,R,S,W,X,Y$等），而$-$表示空类型，$P$与$c$分别表示顶针和晶体。
+				
+				记
+				$$
+				\mathbb{C}_{\mathrm{blk}}
+				=
+				\{-\}\cup \mathbb{C}
+				$$
+				为所有块颜色构成的集合，其中$\mathbb{C}$为所有可能存在的颜色的集合
+				（例如$r,g,b,y,m,c,w,k,u$等），而$-$表示无颜色。
+				
+				一个\textbf{块}是一个二元组
+				$$
+				b=(\tau,\chi)\in \mathbb{T}_{\mathrm{blk}}\times \mathbb{C}_{\mathrm{blk}},
+				$$
+				其中$\tau$称为块的类型，$\chi$称为块的颜色。
+				
+				所有块构成的集合记为
+				$$
+				\mathbb{B}
+				=
+				\mathbb{T}_{\mathrm{blk}}\times \mathbb{C}_{\mathrm{blk}}.
+				$$
+				
+				称
+				$$
+				\mathbf{0}:=(-,-)\in\mathbb{B}
+				$$
+				为\textbf{空块}。
+			\end{definition}
+			
+			\begin{definition}[图形]
+				设$\mathbb{B}$为所有块构成的集合。一个\textbf{图形}是一个矩阵
+				$$
+				S=(b_{ij})\in \mathbb{B}^{h\times w},
+				$$
+				其中$h,w\in\mathbb{N}_{+}$分别称为图形的高度和宽度，并且$w$为偶数。
+				
+				记$S$的高度和宽度分别为
+				$$
+				\operatorname{ht}(S)=h,\qquad \operatorname{wd}(S)=w.
+				$$
+				定义$S$的位置集合为
+				$$
+				I_S=\{1,\dots,h\}\times\{1,\dots,w\}.
+				$$
+				
+				对任意位置$p=(i,j)\in I_S$，记
+				$$
+				S_p=b_{ij}.
+				$$
+				若
+				$$
+				S_p=(\tau_p,\chi_p),
+				$$
+				则称$\tau_p$和$\chi_p$分别为位置$p$处块的类型和颜色。
+				
+				所有图形构成的集合记为
+				$$
+				\mathbb{S}
+				=
+				\bigcup_{\substack{h,w\in\mathbb{N}_{+}\\ 2\mid w}}
+				\mathbb{B}^{h\times w}.
+				$$
+			\end{definition}
+		
+			\begin{definition}[非空位置与晶体位置]
+				设$S\in\mathbb{S}$。
+				定义$S$中的非空位置集合为
+				$$
+				U_S=\{p\in I_S\mid S_p\neq \mathbf{0}\}.
+				$$
+				定义$S$中的晶体位置集合为
+				$$
+				C_S=\{p\in I_S\mid \tau_p=c\}.
+				$$
+			\end{definition}
+			
+			\begin{definition}[置空]
+				设$S\in\mathbb{S}$，$A\subseteq I_S$。
+				定义将$S$在$A$上的块置空后得到的图形为
+				$$
+				S\setminus A.
+				$$
+				其满足对任意$p\in I_S$，
+				$$
+				(S\setminus A)_p
+				=
+				\begin{cases}
+					\mathbf{0}, & p\in A,\\
+					S_p, & p\notin A.
+				\end{cases}
+				$$
+			\end{definition}
+			
+		\subsection{粘连与支撑}
+		
+			\begin{definition}[直接粘连]
+				设$S\in\mathbb{S}$。
+				记
+				$$
+				\mathbb{A}=\mathbb{T}\cup\{c\}
+				$$
+				为可参与粘连的类型集合。
+				
+				对任意$p=(i,j),q=(i',j')\in U_S$，称$p$与$q$在$S$中\textbf{直接粘连}，记作
+				$$
+				p\sim_S q,
+				$$
+				当且仅当满足以下条件之一：
+				\begin{enumerate}
+					\item $p$与$q$水平相邻，且二者类型都属于$\mathbb{A}$，即
+					$$
+					i=i',\qquad |j-j'|=1,\qquad \tau_p,\tau_q\in \mathbb{A};
+					$$
+					\item $p$与$q$垂直相邻，且二者都为晶体，即
+					$$
+					j=j',\qquad |i-i'|=1,\qquad \tau_p=\tau_q=c.
+					$$
+				\end{enumerate}
+				特别地，顶针$P$不与任何其他块直接粘连。
+			\end{definition}
+			
+			\begin{definition}[粘连路径、粘连组与最大粘连组]
+				设$S\in\mathbb{S}$。
+				对任意$p,q\in U_S$，若存在有限序列
+				$$
+				p=p_0,p_1,\dots,p_n=q
+				$$
+				使得对每个$k=1,\dots,n$都有
+				$$
+				p_{k-1}\sim_S p_k,
+				$$
+				则称$p$与$q$在$S$中\textbf{粘连连通}，记作
+				$$
+				p\equiv_S q.
+				$$
+				上述序列称为一条从$p$到$q$的\textbf{粘连路径}。
+				
+				由$\equiv_S$所诱导的等价类称为$S$中的\textbf{最大粘连组}。
+				记所有最大粘连组构成的集合为
+				$$
+				\mathcal{G}(S)=U_S/{\equiv_S}.
+				$$
+				对任意$p\in U_S$，记其所在的最大粘连组为
+				$$
+				[p]_S=\{q\in U_S\mid q\equiv_S p\}.
+				$$
+				由于顶针$P$不与任何其他块直接粘连，因此顶针所在的最大粘连组总是单点集。
+			\end{definition}
+			
+			\begin{definition}[块的支撑关系]
+				设$S\in\mathbb{S}$。
+				对任意$p=(i,j),q=(i',j')\in U_S$，称位置$p$处的块\textbf{支撑}位置$q$处的块，记作
+				$$
+				p\preceq_S q,
+				$$
+				当且仅当满足以下条件之一：
+				\begin{enumerate}
+					\item $p$在$q$的正下方相邻，即
+					$$
+					i=i'+1,\qquad j=j';
+					$$
+					\item $p$与$q$水平粘连，即
+					$$
+					i=i',\qquad |j-j'|=1,\qquad p\sim_S q;
+					$$
+					\item $p$与$q$垂直粘连，且$p$在$q$的正上方相邻，即
+					$$
+					i=i'-1,\qquad j=j',\qquad p\sim_S q.
+					$$
+				\end{enumerate}
+			\end{definition}
+			
+			\begin{definition}[最大粘连组的支撑关系]
+				设$S\in\mathbb{S}$，且$G,H\in \mathcal{G}(S)$为$S$中的两个最大粘连组。
+				称$G$\textbf{支撑}着$H$，记作
+				$$
+				G\preceq_S H,
+				$$
+				当且仅当存在
+				$$
+				p\in G,\qquad q\in H,
+				$$
+				使得
+				$$
+				p\preceq_S q.
+				$$
+			\end{definition}	
+						
+			\begin{definition}[支撑图]
+				设$S\in\mathbb{S}$。
+				定义$S$的\textbf{支撑图}为有向图
+				$$
+				\Gamma_S=(\mathcal{G}(S),E_S),
+				$$
+				其中顶点集为$S$中的所有最大粘连组，边集定义为
+				$$
+				E_S
+				=
+				\{(G,H)\in \mathcal{G}(S)\times\mathcal{G}(S)
+				\mid G\neq H,\; G\preceq_S H\}.
+				$$
+				若
+				$$
+				(G,H)\in E_S,
+				$$
+				则称$G$\textbf{直接支撑}$H$，也称$H$直接受$G$支撑，记作
+				$$
+				G\to_S H.
+				$$
+			\end{definition}
+			
+			\begin{definition}[支撑路径]
+				设$S\in\mathbb{S}$，令$\Gamma_S=(\mathcal{G}(S),E_S)$为$S$的支撑图。
+				
+				若存在有限序列
+				$$
+				G_0,G_1,\dots,G_n\in\mathcal{G}(S)
+				$$
+				满足
+				$$
+				G_{k-1}\to_S G_k,
+				\qquad k=1,\dots,n,
+				$$
+				则称该序列为一条从$G_0$到$G_n$的\textbf{支撑路径}。
+				
+				若存在从$G$到$H$的支撑路径，则记作
+				$$
+				G\leadsto_S H.
+				$$
+			\end{definition}
+			
+			\begin{definition}[循环支撑结构]
+				设$S\in\mathbb{S}$，令$\Gamma_S=(\mathcal{G}(S),E_S)$为$S$的支撑图。
+				
+				若存在互不相同的最大粘连组
+				$$
+				G_0,G_1,\dots,G_{n-1}\in\mathcal{G}(S),
+				\qquad n\geq 2,
+				$$
+				使得
+				$$
+				G_0\to_S G_1\to_S \cdots \to_S G_{n-1}\to_S G_0,
+				$$
+				则称
+				$$
+				(G_0,G_1,\dots,G_{n-1})
+				$$
+				构成$S$中的一个\textbf{循环支撑结构}。
+				
+				等价地，循环支撑结构是支撑图$\Gamma_S$中的一个有向环。
+			\end{definition}
+			
+			\begin{definition}[循环支撑分量]
+				设$S\in\mathbb{S}$，令$\Gamma_S=(\mathcal{G}(S),E_S)$为$S$的支撑图。
+				
+				一个非空集合
+				$$
+				\mathcal{K}\subseteq \mathcal{G}(S)
+				$$
+				称为$S$中的一个\textbf{循环支撑分量}，如果满足：
+				\begin{enumerate}
+					\item 对任意$G,H\in\mathcal{K}$，都有
+					$$
+					G\leadsto_S H
+					\quad\text{且}\quad
+					H\leadsto_S G;
+					$$
+					\item $\mathcal{K}$关于上述性质是极大的，即不存在更大的集合
+					$$
+					\mathcal{K}'\subseteq\mathcal{G}(S)
+					$$
+					使得
+					$$
+					\mathcal{K}\subsetneq \mathcal{K}'
+					$$
+					且$\mathcal{K}'$中任意两个最大粘连组也都相互可达；
+					\item $\mathcal{K}$中至少包含一个有向环。
+				\end{enumerate}
+				
+				换言之，循环支撑分量是支撑图$\Gamma_S$中含有有向环的强连通分量。
+			\end{definition}
+			
+		\subsection{下落过程}
+		
+			\begin{definition}[可下落]
+				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$为$S$中的一个最大粘连组。
+				记
+				$$
+				h=\operatorname{ht}(S),\qquad w=\operatorname{wd}(S).
+				$$
+				记
+				$$
+				G^\downarrow=\{(i+1,j)\mid (i,j)\in G\}.
+				$$
+				若满足
+				$$
+				G^\downarrow\subseteq I_S
+				$$
+				且
+				$$
+				G^\downarrow\cap (U_S\setminus G)=\varnothing,
+				$$
+				则称$G$在$S$中\textbf{可以下落一层}。
+				
+				等价地，$G$可以下落一层，当且仅当$G$中的每个块向下平移一格后，均不会越界，也不会与$G$之外的任何非空块发生冲突。
+			\end{definition}
+			
+			\begin{definition}[一次下落]
+				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$，且$G$在$S$中可以下落一层。
+				记
+				$$
+				D_G=\{p\in G\mid \tau_p\neq c\},
+				\qquad
+				D_G^\downarrow=\{(i+1,j)\mid (i,j)\in D_G\}.
+				$$
+				定义$G$在$S$中的一次下落结果
+				$$
+				\Phi_G(S)\in\mathbb{S}
+				$$
+				为满足对任意$q=(i,j)\in I_S$，
+				$$
+				\bigl(\Phi_G(S)\bigr)_q
+				=
+				\begin{cases}
+					S_{(i-1,j)}, & (i-1,j)\in D_G,\\
+					S_q, & q\notin G\cup D_G^\downarrow,\\
+					\mathbf{0}, & \text{其他情况}.
+				\end{cases}
+				$$
+				也就是说，$G$中的非晶体块整体下落一层，$G$中的晶体块被删除，其他位置保持不变。
+			\end{definition}
+			
+			\begin{definition}[下落后继组]
+				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$，且$G$在$S$中可以下落一层。
+				记
+				$$
+				D_G=\{p\in G\mid \tau_p\neq c\}
+				$$
+				为$G$中的非晶体位置集合，并记
+				$$
+				D_G^\downarrow=\{(i+1,j)\mid (i,j)\in D_G\}.
+				$$
+				令
+				$$
+				S'=\Phi_G(S).
+				$$
+				定义$G$在一次下落后产生的\textbf{下落后继组集合}为
+				$$
+				\operatorname{Succ}_S(G)
+				=
+				\{H\in\mathcal{G}(S')\mid H\subseteq D_G^\downarrow\}.
+				$$
+				
+				也就是说，$\operatorname{Succ}_S(G)$由$G$下落并删除晶体后剩余部分在新图形中形成的最大粘连组组成。
+			\end{definition}
+			
+			\begin{definition}[队列规则]
+				一个\textbf{队列规则}是指对任意图形$S\in\mathbb{S}$，给出一个映射
+				$$
+				\omega_S:\mathcal{P}_{\mathrm{fin}}(\mathcal{G}(S))
+				\longrightarrow
+				\mathcal{G}(S)^{<\omega},
+				$$
+				其中$\mathcal{P}_{\mathrm{fin}}(\mathcal{G}(S))$表示$\mathcal{G}(S)$的所有有限子集，
+				$\mathcal{G}(S)^{<\omega}$表示由$\mathcal{G}(S)$中元素构成的有限队列。
+				
+				要求对任意有限集合$\mathcal{A}\subseteq\mathcal{G}(S)$，
+				队列$\omega_S(\mathcal{A})$中的元素恰好为$\mathcal{A}$中的所有元素，且每个元素出现一次。
+			\end{definition}
+			
+			\begin{definition}[下落状态]
+				一个\textbf{下落状态}是一个三元组
+				$$
+				\Sigma=(S,Q,f),
+				$$
+				其中：
+				\begin{itemize}
+					\item $S\in\mathbb{S}$是当前图形；
+					\item $Q$是由当前图形中的最大粘连组构成的有限队列；
+					\item $f\in\{\mathrm{false},\mathrm{true}\}$表示当前轮次中是否已经发生过下落。
+				\end{itemize}
+			\end{definition}
+			
+			\begin{definition}[下落状态转移]
+				设$\omega$为一个队列规则。
+				设
+				$$
+				\Sigma=(S,Q,f)
+				$$
+				为一个下落状态。定义关于$\omega$的一步状态转移
+				$$
+				\Sigma\longrightarrow_\omega \Sigma'
+				$$
+				如下。
+				
+				\begin{enumerate}
+					\item 若$Q$为空且$f=\mathrm{false}$，则$\Sigma$为终止状态，不再发生状态转移。
+					
+					\item 若$Q$为空且$f=\mathrm{true}$，则令
+					$$
+					\Sigma'
+					=
+					\bigl(S,\omega_S(\mathcal{G}(S)),\mathrm{false}\bigr).
+					$$
+					也就是说，当前轮次中曾发生下落，因此重新计算当前图形的所有最大粘连组，并按照队列规则$\omega$重新入队，开始新一轮。
+					
+					\item 若$Q$非空，设
+					$$
+					Q=(G,Q_0),
+					$$
+					其中$G$为队首元素，$Q_0$为剩余队列。
+					
+					\begin{enumerate}
+						\item 若$G$在$S$中不可下落一层，则令
+						$$
+						\Sigma'
+						=
+						(S,Q_0,f).
+						$$
+						
+						\item 若$G$在$S$中可以下落一层，则令
+						$$
+						S'=\Phi_G(S),
+						$$
+						并令
+						$$
+						\Sigma'
+						=
+						\bigl(
+						S',
+						Q_0\mathbin{\Vert}\omega_{S'}(\operatorname{Succ}_S(G)),
+						\mathrm{true}
+						\bigr).
+						$$
+						其中$\mathbin{\Vert}$表示队列拼接。
+					\end{enumerate}
+				\end{enumerate}
+			\end{definition}
+								
+			\begin{definition}[由队列规则诱导的全局下落映射]
+				设$\omega$为一个队列规则，设$S\in\mathbb{S}$。
+				定义初始下落状态为
+				$$
+				\Sigma_0^\omega(S)
+				=
+				\bigl(
+				S,
+				\omega_S(\mathcal{G}(S)),
+				\mathrm{false}
+				\bigr).
+				$$
+				
+				从$\Sigma_0^\omega(S)$出发，按照关于$\omega$的下落状态转移反复转移：
+				$$
+				\Sigma_0^\omega(S)
+				\longrightarrow_\omega
+				\Sigma_1^\omega(S)
+				\longrightarrow_\omega
+				\cdots.
+				$$
+				若该过程在有限步后终止于
+				$$
+				\Sigma_N^\omega(S)=(S_N,Q_N,f_N),
+				$$
+				则定义
+				$$
+				\operatorname{Fall}_{\omega}(S)=S_N.
+				$$
+				称$\operatorname{Fall}_{\omega}$为由队列规则$\omega$诱导的\textbf{全局下落映射}。
+			\end{definition}
+						
+			\begin{proposition}[可下落的等价刻画]\label{prop:fallable-characterization}
+				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$。
+				则$G$在$S$中可以下落一层，当且仅当$G$既不触地，也不受支撑。
+			\end{proposition}
+			
+			\begin{proof}
+				由可下落定义，$G$可以下落一层当且仅当
+				$$
+				G^\downarrow\subseteq I_S
+				$$
+				且
+				$$
+				G^\downarrow\cap(U_S\setminus G)=\varnothing.
+				$$
+				第一个条件等价于$G$不触地。
+				
+				下面说明第二个条件等价于$G$不受支撑。
+				若
+				$$
+				G^\downarrow\cap(U_S\setminus G)\neq\varnothing,
+				$$
+				则存在$p=(i,j)\in G$，使得
+				$$
+				p^\downarrow=(i+1,j)\in U_S\setminus G.
+				$$
+				设$p^\downarrow\in H$，其中$H\in\mathcal{G}(S)$且$H\neq G$。
+				由于$p^\downarrow$在$p$的正下方相邻，故$p^\downarrow$处的块支撑$p$处的块，从而
+				$$
+				H\to_S G.
+				$$
+				于是$G$受支撑。
+				
+				反之，若$G$受支撑，则存在$H\neq G$使得$H\to_S G$。
+				由支撑图定义，存在$p\in H$与$q\in G$使得$p$支撑$q$。
+				由于$H$与$G$是不同的最大粘连组，$p$与$q$不可能通过粘连产生支撑；
+				否则二者属于同一最大粘连组。
+				因此只能是$p$在$q$的正下方相邻。
+				于是
+				$$
+				p\in G^\downarrow\cap(U_S\setminus G),
+				$$
+				故$G^\downarrow\cap(U_S\setminus G)\neq\varnothing$。
+				
+				综上，$G$可下落当且仅当$G$既不触地，也不受支撑。
+			\end{proof}
+			
+			\begin{proposition}[一次下落不新增外部受支撑关系]\label{prop:no-new-external-support}
+				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$，且$G$在$S$中可以下落一层。
+				记
+				$$
+				S'=\Phi_G(S).
+				$$
+				设$H\in\mathcal{G}(S)$，$H\neq G$，且$H$在$S'$中仍对应为一个最大粘连组。
+				若$H$在$S$中不受支撑，则$H$在$S'$中也不受支撑。
+			\end{proposition}
+			
+			\begin{proof}
+				由于$G$可以下落一层，$G^\downarrow$中不存在$G$之外的非空位置。
+				因此$G$下落时不会与任何外部组发生碰撞。
+				
+				设$H\neq G$为另一个最大粘连组。
+				若$H$在$S'$中受支撑，则存在某个最大粘连组$K$，使得
+				$$
+				K\to_{S'}H.
+				$$
+				若该支撑关系完全由$G$之外的块产生，则相同的支撑关系在$S$中已经存在，
+				从而$H$在$S$中受支撑，矛盾。
+				
+				因此唯一需要考虑的是：该支撑关系是否由$G$下落后的块产生。
+				但$G$整体向下平移一层后，其块只会远离其上方的块，不可能新出现在某个外部组$H$的正下方相邻位置。
+				同时，由假设，下落后的$G$不会与外部组重新粘连。
+				故$G$的下落不会产生指向外部组$H$的新支撑边。
+				
+				于是$H$在$S'$中不受支撑。
+			\end{proof}
+			
+			\begin{proposition}[可下落组的保持性]\label{prop:fallable-preservation}
+				设$S\in\mathbb{S}$，$G,H\in\mathcal{G}(S)$，且$G\neq H$。
+				若$G$与$H$在$S$中都可以下落一层，则$H$在$\Phi_G(S)$中仍可以下落一层。
+			\end{proposition}
+			
+			\begin{proof}
+				记
+				$$
+				S'=\Phi_G(S).
+				$$
+				由于$H$在$S$中可以下落一层，由\cref{prop:fallable-characterization}可知，$H$既不触地，也不受支撑。
+				
+				首先，$G$的下落不会改变$H$的位置，因此$H$是否触地不变。
+				故$H$在$S'$中仍不触地。
+				
+				其次，由\cref{prop:no-new-external-support}，$G$的下落不会使原本不受支撑的外部组$H$变为受支撑。
+				因此$H$在$S'$中仍不受支撑。
+				
+				再由\cref{prop:fallable-characterization}可知，$H$在$S'$中仍可以下落一层。
+			\end{proof}
+			
+			\begin{proposition}[可下落组的一次下落交换律]\label{prop:fall-commutation}
+				设$S\in\mathbb{S}$，$G,H\in\mathcal{G}(S)$，且$G\neq H$。
+				若$G$与$H$在$S$中都可以下落一层，则
+				$$
+				\Phi_H(\Phi_G(S))
+				=
+				\Phi_G(\Phi_H(S)).
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				由于$G$与$H$是不同的最大粘连组，故
+				$$
+				G\cap H=\varnothing.
+				$$
+				又由于二者在$S$中都可以下落一层，故
+				$$
+				G^\downarrow\cap(U_S\setminus G)=\varnothing,
+				\qquad
+				H^\downarrow\cap(U_S\setminus H)=\varnothing.
+				$$
+				特别地，$G$的下落目标区域不会与$H$发生冲突，$H$的下落目标区域也不会与$G$发生冲突。
+				
+				由\cref{prop:fallable-preservation}，先下落$G$后，$H$仍可以下落；
+				同理，先下落$H$后，$G$仍可以下落。
+				
+				两种执行顺序中，$G$中的非晶体块均向下平移一层，$G$中的晶体块均被删除；
+				$H$中的非晶体块均向下平移一层，$H$中的晶体块均被删除；
+				而$G\cup H$之外的块保持不变。
+				因此两种顺序得到的图形相同，即
+				$$
+				\Phi_H(\Phi_G(S))
+				=
+				\Phi_G(\Phi_H(S)).
+				$$
+			\end{proof}
+			
+			\begin{proposition}[下落过程的终止性]\label{prop:fall-termination}
+				设$\omega$为任意队列规则。
+				对任意图形$S\in\mathbb{S}$，从初始状态$\Sigma_0^\omega(S)$出发的下落状态转移过程
+				$$
+				\Sigma_0^\omega(S)
+				\longrightarrow_\omega
+				\Sigma_1^\omega(S)
+				\longrightarrow_\omega
+				\cdots
+				$$
+				在有限步后终止。
+			\end{proposition}
+			
+			\begin{proof}
+				每当发生一次实际下落时，至少有一个非晶体块向下移动一层，或者至少有一个晶体块被删除。
+				由于图形高度有限，非晶体块向下移动的总次数有限；同时晶体块数量有限，晶体删除次数也有限。
+				因此实际下落只能发生有限次。
+				
+				在两次实际下落之间，队列长度有限；若处理到不可下落组，则队列长度减少$1$；若处理到可下落组，则发生一次实际下落。
+				由于实际下落次数有限，而每段不发生实际下落的队列处理次数也有限，故整个状态转移过程只能进行有限步。
+			\end{proof}
+						
+			\begin{proposition}[队列顺序无关性]\label{prop:queue-independence}
+				设$\omega_1,\omega_2$为任意两个队列规则。
+				则对任意图形$S\in\mathbb{S}$，都有
+				$$
+				\operatorname{Fall}_{\omega_1}(S)
+				=
+				\operatorname{Fall}_{\omega_2}(S).
+				$$
+				也就是说，全局下落结果与最大粘连组的入队顺序无关。
+			\end{proposition}
+			
+			\begin{proof}
+				固定初始图形$S$。
+				由\cref{prop:fall-termination}，从$S$出发的任意队列规则下，下落状态转移过程均在有限步后终止。
+				
+				考虑任意一次轮次中的队列处理。
+				在该轮次中，真正发生的一次下落总是选取当前图形中某个可以下落一层的最大粘连组。
+				由\cref{prop:fallable-preservation}，若两个不同最大粘连组在同一状态下均可以下落，则先下落其中一个不会使另一个变为不可下落。
+				由\cref{prop:fall-commutation}，这两个一次下落操作的执行顺序可以交换，且交换后得到的图形相同。
+				
+				因此，在任意有限下落序列中，若相邻两次实际下落操作的执行对象在同一状态下均可下落，则可以交换它们而不改变最终图形。
+				反复应用该交换律，可以将由队列规则$\omega_1$产生的实际下落序列重排为由队列规则$\omega_2$产生的实际下落序列，而终止图形保持不变。
+				
+				故
+				$$
+				\operatorname{Fall}_{\omega_1}(S)
+				=
+				\operatorname{Fall}_{\omega_2}(S).
+				$$
+			\end{proof}
+			
+			\begin{definition}[全局下落映射]
+				由\cref{prop:queue-independence}，$\operatorname{Fall}_{\omega}(S)$与队列规则$\omega$无关。
+				因此定义
+				$$
+				\operatorname{Fall}(S)=\operatorname{Fall}_{\omega}(S),
+				$$
+				其中$\omega$为任意队列规则。
+				称
+				$$
+				\operatorname{Fall}:\mathbb{S}\to\mathbb{S}
+				$$
+				为\textbf{全局下落映射}。
+			\end{definition}
+			
+			
+			\begin{definition}[稳定图形]
+				设$\operatorname{Fall}:\mathbb{S}\to\mathbb{S}$为全局下落映射。
+				若图形$S\in\mathbb{S}$满足
+				$$
+				\operatorname{Fall}(S)=S,
+				$$
+				则称$S$是\textbf{稳定的}。
+				记所有稳定图形构成的集合为
+				$$
+				\mathbb{S}_{\mathrm{st}}
+				=
+				\{S\in\mathbb{S}\mid \operatorname{Fall}(S)=S\}.
+				$$
+			\end{definition}
+			
+			\begin{definition}[触地组与受支撑组]
+				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$。
+				若
+				$$
+				G^\downarrow\not\subseteq I_S,
+				$$
+				则称$G$在$S$中\textbf{触地}。
+				
+				若存在$H\in\mathcal{G}(S)$，$H\neq G$，使得
+				$$
+				H\to_S G,
+				$$
+				则称$G$在$S$中\textbf{受支撑}。
+			\end{definition}
+			
+			\begin{definition}[支撑闭包算子]
+				设$S\in\mathbb{S}$。
+				定义$S$中的触地组集合为
+				$$
+				\mathcal{B}_S
+				=
+				\{G\in\mathcal{G}(S)\mid G^\downarrow\not\subseteq I_S\}.
+				$$
+				
+				定义映射
+				$$
+				\Theta_S:\mathcal{P}(\mathcal{G}(S))\to \mathcal{P}(\mathcal{G}(S))
+				$$
+				为
+				$$
+				\Theta_S(\mathcal{X})
+				=
+				\mathcal{B}_S
+				\cup
+				\{H\in\mathcal{G}(S)\mid \exists G\in\mathcal{X},\ G\to_S H\}.
+				$$
+				称$\Theta_S$为$S$的\textbf{支撑闭包算子}。
+			\end{definition}
+			
+			\begin{proposition}[支撑闭包算子的单调性]
+				设$S\in\mathbb{S}$。
+				若
+				$$
+				\mathcal{X}\subseteq \mathcal{Y}\subseteq \mathcal{G}(S),
+				$$
+				则
+				$$
+				\Theta_S(\mathcal{X})\subseteq \Theta_S(\mathcal{Y}).
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				由定义，
+				$$
+				\Theta_S(\mathcal{X})
+				=
+				\mathcal{B}_S
+				\cup
+				\{H\in\mathcal{G}(S)\mid \exists G\in\mathcal{X},\ G\to_S H\}.
+				$$
+				若$\mathcal{X}\subseteq\mathcal{Y}$，则任意由$\mathcal{X}$中的元素直接支撑的最大粘连组，也必然由$\mathcal{Y}$中的元素直接支撑。
+				因此
+				$$
+				\{H\mid \exists G\in\mathcal{X},\ G\to_S H\}
+				\subseteq
+				\{H\mid \exists G\in\mathcal{Y},\ G\to_S H\}.
+				$$
+				再并上相同的$\mathcal{B}_S$，即得
+				$$
+				\Theta_S(\mathcal{X})\subseteq \Theta_S(\mathcal{Y}).
+				$$
+			\end{proof}
+			
+			\begin{definition}[支撑不动点]
+				设$S\in\mathbb{S}$，令$\Theta_S$为$S$的支撑闭包算子。
+				
+				定义序列
+				$$
+				\mathcal{L}_0=\varnothing,
+				\qquad
+				\mathcal{L}_{n+1}=\Theta_S(\mathcal{L}_n).
+				$$
+				由于$\mathcal{G}(S)$有限，存在$N\in\mathbb{N}$使得
+				$$
+				\mathcal{L}_{N+1}=\mathcal{L}_N.
+				$$
+				称
+				$$
+				\mu\Theta_S:=\mathcal{L}_N
+				$$
+				为$\Theta_S$的\textbf{最小不动点}。
+				
+				类似地，定义序列
+				$$
+				\mathcal{M}_0=\mathcal{G}(S),
+				\qquad
+				\mathcal{M}_{n+1}=\Theta_S(\mathcal{M}_n).
+				$$
+				由于$\mathcal{G}(S)$有限，存在$M\in\mathbb{N}$使得
+				$$
+				\mathcal{M}_{M+1}=\mathcal{M}_M.
+				$$
+				称
+				$$
+				\nu\Theta_S:=\mathcal{M}_M
+				$$
+				为$\Theta_S$的\textbf{最大不动点}。
+			\end{definition}
+			
+			\begin{proposition}[无循环支撑时不动点唯一]
+				设$S\in\mathbb{S}$。
+				若支撑图$\Gamma_S$中不存在循环支撑结构，则
+				$$
+				\mu\Theta_S=\nu\Theta_S.
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				由于$\Gamma_S$中不存在循环支撑结构，$\Gamma_S$是有向无环图。
+				在有向无环图中，任意最大粘连组$G$若不从某个触地组出发可达，则不存在由触地组向上蔓延到$G$的支撑路径。
+				
+				最小不动点$\mu\Theta_S$正是从触地组集合$\mathcal{B}_S$出发，沿支撑边反复向上扩张所得的集合，即
+				$$
+				\mu\Theta_S
+				=
+				\{G\in\mathcal{G}(S)\mid \exists B\in\mathcal{B}_S,\ B\leadsto_S G\}
+				\cup \mathcal{B}_S.
+				$$
+				
+				另一方面，在无环图中，若一个最大粘连组不从触地组可达，则它所在的向下支撑链最终不能回到自身，也不能到达触地组，因此它不可能属于任何不动点。
+				所以任意不动点都包含于上述由触地组向上可达的集合。
+				
+				因此$\Theta_S$只有一个不动点，从而
+				$$
+				\mu\Theta_S=\nu\Theta_S.
+				$$
+			\end{proof}
+			
+			\begin{definition}[循环支撑核]
+				设$S\in\mathbb{S}$。
+				定义$S$的\textbf{循环支撑核}为
+				$$
+				\mathcal{Z}_S
+				=
+				\{G\in\mathcal{G}(S)\mid G\text{属于某个循环支撑结构}\}.
+				$$
+			\end{definition}
+			
+			\begin{proposition}[最大不动点的循环刻画]
+				设$S\in\mathbb{S}$。
+				则
+				$$
+				\nu\Theta_S
+				=
+				\{H\in\mathcal{G}(S)
+				\mid
+				\exists G\in \mathcal{B}_S\cup \mathcal{Z}_S,\ 
+				G\leadsto_S H
+				\}
+				\cup
+				\mathcal{B}_S
+				\cup
+				\mathcal{Z}_S.
+				$$
+				也就是说，最大不动点由触地组、循环支撑结构中的组，以及它们沿支撑关系向上蔓延得到的所有组组成。
+			\end{proposition}
+			
+			\begin{proof}
+				记右侧集合为$\mathcal{N}$。
+				
+				首先，$\mathcal{B}_S\subseteq \mathcal{N}$。
+				若$G\in\mathcal{N}$且$G\to_S H$，则由支撑路径的定义可知$H$仍可由$\mathcal{B}_S\cup\mathcal{Z}_S$中的某个元素到达，故$H\in\mathcal{N}$。
+				因此
+				$$
+				\Theta_S(\mathcal{N})\subseteq\mathcal{N}.
+				$$
+				另一方面，由$\mathcal{N}$的构造，$\mathcal{N}$中的每个元素要么属于$\mathcal{B}_S$，要么属于某个循环支撑结构，或由前二者沿支撑边到达。
+				触地组显然属于$\Theta_S(\mathcal{N})$；循环支撑结构中的每个组都由同一循环中的前一个组支撑，故也属于$\Theta_S(\mathcal{N})$；其上方闭包中的元素也由路径上的前一个元素支撑。
+				因此
+				$$
+				\mathcal{N}\subseteq\Theta_S(\mathcal{N}).
+				$$
+				于是
+				$$
+				\Theta_S(\mathcal{N})=\mathcal{N},
+				$$
+				即$\mathcal{N}$是不动点。
+				
+				任意不动点若包含某个非触地且不处于循环支撑结构向上闭包中的元素，则沿支撑关系不断向下追溯，由于图形有限，最终要么到达触地组，要么进入循环。
+				若二者都不发生，则不可能维持不动点条件。
+				因此任意不动点均包含于$\mathcal{N}$。
+				故$\mathcal{N}$为最大不动点，即
+				$$
+				\nu\Theta_S=\mathcal{N}.
+				$$
+			\end{proof}
+			
+			\begin{definition}[静态不可下落组]
+				设$S\in\mathbb{S}$。
+				定义
+				$$
+				\mathcal{N}(S):=\nu\Theta_S
+				$$
+				为$S$中的\textbf{静态不可下落组集合}。
+				
+				其补集
+				$$
+				\mathcal{F}(S)
+				=
+				\mathcal{G}(S)\setminus \mathcal{N}(S)
+				$$
+				称为$S$中的\textbf{静态可下落组集合}。
+			\end{definition}
+			
+			\begin{proposition}[不可下落组的不动点刻画]\label{prop:nonfalling-fixed-point}
+				设$S\in\mathbb{S}$。
+				在从$S$出发的全局下落过程中，初始最大粘连组中不会执行下落的部分恰为
+				$$
+				\mathcal{N}(S)=\nu\Theta_S.
+				$$
+				换言之，一个初始最大粘连组$G\in\mathcal{G}(S)$不会在下落过程中发生下落，当且仅当
+				$$
+				G\in\nu\Theta_S.
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				首先，触地组不可能下落。
+				若$G$不会下落且$G\to_S H$，则$H$始终受到$G$的支撑，因此$H$也不会下落。
+				所以所有不会下落的组构成$\Theta_S$的不动点，故包含于最大不动点$\nu\Theta_S$。
+				
+				反过来，设$G\in\nu\Theta_S$。
+				由于$\nu\Theta_S$是不动点，若$G$不是触地组，则存在$H\in\nu\Theta_S$使得
+				$$
+				H\to_S G.
+				$$
+				也就是说，$\nu\Theta_S$中的每个非触地组都受到同在$\nu\Theta_S$中的某个组支撑。
+				因此$\nu\Theta_S$中的组要么由触地组向上支撑得到，要么处在循环支撑结构及其上方支撑闭包中。
+				触地组不会下落；循环支撑结构中的组相互支撑，因而没有任何一个能首先下落；其上方闭包中的组又被这些不下落的组支撑。
+				故$\nu\Theta_S$中的组均不会下落。
+				
+				综上，不会下落的组恰为$\nu\Theta_S$。
+			\end{proof}
+			
+			\begin{definition}[静态下落过程]
+				设$S\in\mathbb{S}$。
+				令
+				$$
+				\mathcal{N}(S)=\nu\Theta_S
+				$$
+				为静态不可下落组集合，令
+				$$
+				\mathcal{F}(S)=\mathcal{G}(S)\setminus\mathcal{N}(S)
+				$$
+				为静态可下落组集合。
+				
+				记静态可下落部分的位置集合为
+				$$
+				P_{\mathrm{fall}}(S)
+				=
+				\bigcup_{G\in\mathcal{F}(S)}G.
+				$$
+				记其中的晶体位置集合为
+				$$
+				C_{\mathrm{fall}}(S)
+				=
+				P_{\mathrm{fall}}(S)\cap C_S.
+				$$
+				
+				静态下落过程首先将$C_{\mathrm{fall}}(S)$中的晶体全部置空，得到
+				$$
+				S^{\ast}=S\setminus C_{\mathrm{fall}}(S).
+				$$
+				然后保持$\mathcal{N}(S)$中的所有块不动，将其余非空块按照从下到上的顺序依次下落，直到不能继续下落为止。
+				所得图形记为
+				$$
+				\operatorname{Fall}_{\mathrm{st}}(S).
+				$$
+			\end{definition}
+			
+			\begin{theorem}[队列下落与静态下落的等价性]
+				对任意图形$S\in\mathbb{S}$，都有
+				$$
+				\operatorname{Fall}(S)
+				=
+				\operatorname{Fall}_{\mathrm{st}}(S).
+				$$
+			\end{theorem}
+			
+			\begin{proof}
+				由\cref{prop:nonfalling-fixed-point}，队列式下落过程中不会下落的初始最大粘连组恰为
+				$$
+				\mathcal{N}(S)=\nu\Theta_S.
+				$$
+				因此这些组中的块在两种下落过程中均保持不动。
+				
+				对补集
+				$$
+				\mathcal{F}(S)=\mathcal{G}(S)\setminus\mathcal{N}(S)
+				$$
+				中的最大粘连组，它们在队列式下落过程中都会执行至少一次下落。
+				每个执行下落的组在第一次下落时，其内部晶体都会被删除。
+				因此队列式下落中被删除的晶体位置正是
+				$$
+				C_{\mathrm{fall}}(S)
+				=
+				P_{\mathrm{fall}}(S)\cap C_S.
+				$$
+				
+				删除这些晶体后，剩余的可下落部分不再受到$\mathcal{N}(S)$之外的稳定支撑。
+				由队列顺序无关性，剩余部分的具体处理顺序不影响最终结果。
+				因此可以等价地按照从下到上的顺序处理下落。
+				
+				故静态下落过程得到的图形与队列式全局下落过程得到的图形相同，即
+				$$
+				\operatorname{Fall}_{\mathrm{st}}(S)
+				=
+				\operatorname{Fall}(S).
+				$$
+			\end{proof}
+			
+		\subsection{晶体机制}
+		
+			\begin{definition}[晶体簇]
+				设$S\in\mathbb{S}$。
+				
+				对任意$p=(i,j),q=(i',j')\in C_S$，称$p$与$q$晶体相邻，记作
+				$$
+				p\sim^{c}_S q,
+				$$
+				当且仅当$p$与$q$上下左右相邻，即
+				$$
+				|i-i'|+|j-j'|=1.
+				$$
+				
+				若对$p,q\in C_S$，存在有限序列
+				$$
+				p=p_0,p_1,\dots,p_n=q
+				$$
+				使得对每个$k=1,\dots,n$都有
+				$$
+				p_{k-1}\sim^{c}_S p_k,
+				$$
+				则称$p$与$q$在$S$中晶体连通，记作
+				$$
+				p\equiv^{c}_S q.
+				$$
+				
+				由$\equiv^{c}_S$诱导的等价类称为$S$中的一个\textbf{晶体簇}。
+				所有晶体簇构成的集合记为
+				$$
+				\mathcal{C}(S)=C_S/{\equiv^{c}_S}.
+				$$
+				对任意$p\in C_S$，记$p$所在的晶体簇为
+				$$
+				[p]^c_S=\{q\in C_S\mid q\equiv^c_S p\}.
+				$$
+			\end{definition}
+						
+			\begin{definition}[晶体破碎]
+			设$S\in\mathbb{S}$，$p\in C_S$。
+			称
+			$$
+			\operatorname{Br}_p(S)
+			=
+			S\setminus [p]^c_S
+			$$
+			为$p$处晶体破碎后的图形。
+		\end{definition}
+\end{document}

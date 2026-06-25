@@ -1,0 +1,33 @@
+# LaTeX temporary files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.log
+*.lot
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+*.xdv
+
+# TeXStudio backup files
+*.bak
+*.backup
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Keep PDF files
+!*.pdf
