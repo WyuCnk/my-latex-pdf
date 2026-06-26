@@ -1144,5 +1144,304 @@
 				为$p$处晶体破碎后的图形。
 			\end{definition}
 			
-		初见乍惊欢，久处亦怦然。
+			\begin{definition}[超上限删除]
+				设$S\in\mathbb{S}$，记
+				$$
+				h=\operatorname{ht}(S),
+				\qquad
+				w=\operatorname{wd}(S).
+				$$
+				给定高度上限$\ell\in\mathbb{N}$，其中$0\leq \ell\leq h$。
+				定义$S$中超过高度上限$\ell$的上方位置集合为
+				$$
+				O_\ell(S)
+				=
+				\{(i,j)\in I_S\mid i\leq h-\ell\}.
+				$$
+				也就是说，$O_\ell(S)$是位于自底向上第$\ell$层以上的所有位置。
+				
+				若$O_\ell(S)$中存在晶体，则这些晶体所在的晶体簇均会破碎。定义由超上限区域触发破碎的晶体位置集合为
+				$$
+				X_\ell(S)
+				=
+				\bigcup_{p\in O_\ell(S)\cap C_S}[p]^c_S.
+				$$
+				
+				定义$S$关于高度上限$\ell$的\textbf{超上限删除结果}为
+				$$
+				\operatorname{Clip}_\ell(S)
+				=
+				S\setminus\bigl(O_\ell(S)\cup X_\ell(S)\bigr).
+				$$
+				称映射
+				$$
+				\operatorname{Clip}_\ell:\mathbb{S}\to\mathbb{S}
+				$$
+				为高度上限$\ell$下的\textbf{超上限删除操作}。
+			\end{definition}
+			
+		\subsection{机器操作}
+			
+			\begin{definition}[旋转]
+				设$S\in\mathbb{S}$为一个图形，记
+				$$
+				h=\operatorname{ht}(S),
+				\qquad
+				w=\operatorname{wd}(S).
+				$$
+				对整数$k\in\mathbb{Z}$，定义$S$顺时针旋转$k$个象限后的图形为
+				$$
+				\operatorname{Rot}_k(S)\in\mathbb{S}.
+				$$
+				其高度与宽度分别仍为$h$与$w$，并且对任意位置
+				$$
+				(i,j)\in I_S=\{1,\dots,h\}\times\{1,\dots,w\},
+				$$
+				有
+				$$
+				\bigl(\operatorname{Rot}_k(S)\bigr)_{(i,j)}
+				=
+				S_{\left(i,\;1+\bigl((j+k-1)\bmod w\bigr)\right)}.
+				$$
+				其中$\bmod w$的取值约定为$\{0,1,\dots,w-1\}$。
+			\end{definition}
+
+			\begin{proposition}[旋转的基本性质]
+				对任意$S\in\mathbb{S}$与任意$k,\ell\in\mathbb{Z}$，有
+				$$
+				\operatorname{Rot}_0(S)=S,
+				$$
+				$$
+				\operatorname{Rot}_k(\operatorname{Rot}_\ell(S))
+				=
+				\operatorname{Rot}_{k+\ell}(S),
+				$$
+				且
+				$$
+				\operatorname{Rot}_{k+w}(S)=\operatorname{Rot}_k(S),
+				$$
+				其中$w=\operatorname{wd}(S)$。
+			\end{proposition}
+			
+			\begin{definition}[东西半边与拼接]
+				设$S\in\mathbb{S}$，记
+				$$
+				h=\operatorname{ht}(S),
+				\qquad
+				w=\operatorname{wd}(S),
+				\qquad
+				m=\frac{w}{2}.
+				$$
+				定义$S$的西半边位置集合与东半边位置集合分别为
+				$$
+				I^{\mathrm W}_S
+				=
+				\{(i,j)\in I_S\mid 1\leq j\leq m\},
+				$$
+				和
+				$$
+				I^{\mathrm E}_S
+				=
+				\{(i,j)\in I_S\mid m<j\leq w\}.
+				$$
+				
+				对任意$A\subseteq I_S$，定义$S$在$A$上的保留图形为
+				$$
+				S|_A
+				=
+				S\setminus (I_S\setminus A).
+				$$
+				也就是说，
+				$$
+				(S|_A)_p
+				=
+				\begin{cases}
+					S_p, & p\in A,\\
+					\mathbf{0}, & p\notin A.
+				\end{cases}
+				$$
+				
+				若$S,T\in\mathbb{S}$具有相同的高度和宽度，则定义由$S$的西半边与$T$的东半边拼接得到的图形为
+				$$
+				S\sqcup T.
+				$$
+				其满足对任意$p\in I_S=I_T$，
+				$$
+				(S\sqcup T)_p
+				=
+				\begin{cases}
+					S_p, & p\in I^{\mathrm W}_S,\\
+					T_p, & p\in I^{\mathrm E}_S.
+				\end{cases}
+				$$
+			\end{definition}
+			
+			\begin{definition}[切割触发晶体]
+				设$S\in\mathbb{S}$，记
+				$$
+				w=\operatorname{wd}(S),
+				\qquad
+				m=\frac{w}{2}.
+				$$
+				定义$S$中位于切割线两侧且会被切割直接触发的晶体位置集合为
+				$$
+				B_{\mathrm{cut}}(S)
+				=
+				\{(i,m)\in C_S\mid (i,m+1)\in C_S\}
+				\cup
+				\{(i,m+1)\in C_S\mid (i,m)\in C_S\}.
+				$$
+				也就是说，若同一层中切割线两侧相邻的两个位置均为晶体，则这两个晶体都会被切割直接触发。
+				
+				定义由切割触发破碎的全部晶体位置集合为
+				$$
+				X_{\mathrm{cut}}(S)
+				=
+				\bigcup_{p\in B_{\mathrm{cut}}(S)} [p]^c_S.
+				$$
+				其中若$B_{\mathrm{cut}}(S)=\varnothing$，则约定
+				$$
+				X_{\mathrm{cut}}(S)=\varnothing.
+				$$
+			\end{definition}
+			
+			\begin{definition}[切割]
+				设$S\in\mathbb{S}$。
+				首先令
+				$$
+				\widehat{S}
+				=
+				S\setminus X_{\mathrm{cut}}(S),
+				$$
+				即先将所有由切割触发破碎的晶体簇置空。
+				
+				定义$S$切割后得到的西半边与东半边分别为
+				$$
+				\operatorname{Cut}_{\mathrm W}(S)
+				=
+				\operatorname{Fall}\bigl(\widehat{S}|_{I^{\mathrm W}_S}\bigr),
+				$$
+				和
+				$$
+				\operatorname{Cut}_{\mathrm E}(S)
+				=
+				\operatorname{Fall}\bigl(\widehat{S}|_{I^{\mathrm E}_S}\bigr).
+				$$
+				
+				定义$S$的\textbf{切割结果}为有序对
+				$$
+				\operatorname{Cut}(S)
+				=
+				\bigl(
+				\operatorname{Cut}_{\mathrm W}(S),
+				\operatorname{Cut}_{\mathrm E}(S)
+				\bigr).
+				$$
+			\end{definition}
+			
+			\begin{definition}[半破]
+				设$S\in\mathbb{S}$。
+				定义$S$经过\textbf{半破}后的结果为
+				$$
+				\operatorname{Half}(S)
+				=
+				\operatorname{Cut}_{\mathrm E}(S).
+				$$
+				也就是说，半破先对$S$执行切割，然后只输出切割后的东半边。
+			\end{definition}
+			
+			\begin{definition}[交换]
+				设$S,T\in\mathbb{S}$具有相同的高度和宽度。
+				记
+				$$
+				\operatorname{Cut}(S)
+				=
+				(S_{\mathrm W},S_{\mathrm E}),
+				\qquad
+				\operatorname{Cut}(T)
+				=
+				(T_{\mathrm W},T_{\mathrm E}).
+				$$
+				定义$S$与$T$经过\textbf{交换}后的结果为有序对
+				$$
+				\operatorname{Swap}(S,T)
+				=
+				\bigl(
+				T_{\mathrm W}\sqcup S_{\mathrm E},
+				S_{\mathrm W}\sqcup T_{\mathrm E}
+				\bigr).
+				$$
+				也就是说，两个输入图形先分别执行切割，然后将所得半边交叉拼接，得到两个新的图形。
+			\end{definition}
+			
+			\begin{definition}[上下拼接]
+				设$S,T\in\mathbb{S}$，且
+				$$
+				\operatorname{wd}(S)=\operatorname{wd}(T)=w.
+				$$
+				记
+				$$
+				h_S=\operatorname{ht}(S),
+				\qquad
+				h_T=\operatorname{ht}(T).
+				$$
+				定义$S$在上、$T$在下且中间间隔一空层的\textbf{上下拼接图形}为
+				$$
+				S\mathbin{\Box}T\in\mathbb{B}^{(h_S+1+h_T)\times w}.
+				$$
+				其满足对任意位置$(i,j)\in I_{S\mathbin{\Box}T}$，
+				$$
+				(S\mathbin{\Box}T)_{(i,j)}
+				=
+				\begin{cases}
+					S_{(i,j)}, & 1\leq i\leq h_S,\\
+					\mathbf{0}, & i=h_S+1,\\
+					T_{(i-h_S-1,j)}, & h_S+2\leq i\leq h_S+1+h_T.
+				\end{cases}
+				$$
+			\end{definition}
+			
+			\begin{definition}[堆叠]
+				设$S,T\in\mathbb{S}$，且
+				$$
+				\operatorname{wd}(S)=\operatorname{wd}(T).
+				$$
+				其中$S$为上方输入图形，$T$为下方输入图形。
+				给定高度上限$\ell\in\mathbb{N}_{+}$。
+				
+				先将$S$置于$T$上方，中间间隔一空层，得到
+				$$
+				U
+				=
+				S\mathbin{\Box}T.
+				$$
+				定义$S$与$T$在高度上限$\ell$下的\textbf{堆叠结果}为
+				$$
+				\operatorname{Stack}_\ell(S,T)
+				=
+				\operatorname{Fall}
+				\Bigl(
+				\operatorname{Clip}_\ell
+				\bigl(
+				\operatorname{Fall}(U)
+				\bigr)
+				\Bigr).
+				$$
+				也即
+				$$
+				\operatorname{Stack}_\ell(S,T)
+				=
+				\operatorname{Fall}
+				\Bigl(
+				\operatorname{Clip}_\ell
+				\bigl(
+				\operatorname{Fall}
+				(
+				S\mathbin{\Box}T
+				)
+				\bigr)
+				\Bigr).
+				$$
+			\end{definition}
+			
 \end{document}
