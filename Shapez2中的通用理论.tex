@@ -1444,4 +1444,566 @@
 				$$
 			\end{definition}
 			
+			\begin{definition}[结晶]
+				设$S\in\mathbb{S}$，$\kappa\in\mathbb{C}$为指定颜色。
+				若$U_S=\varnothing$，则定义
+				$$
+				\operatorname{Cry}_{\kappa}(S)=S.
+				$$
+				
+				若$U_S\neq\varnothing$，定义$S$的最上方非空层为
+				$$
+				\operatorname{top}(S)
+				=
+				\min\{i\mid \exists j,\ (i,j)\in U_S\}.
+				$$
+				定义从最上方非空层开始的区域为
+				$$
+				A_S
+				=
+				\{(i,j)\in I_S\mid i\geq \operatorname{top}(S)\}.
+				$$
+				
+				定义需要被结晶替换的位置集合为
+				$$
+				R_S
+				=
+				\{p\in A_S\mid S_p=\mathbf{0}\ \text{或}\ \tau_p=P\}.
+				$$
+				
+				定义$S$以颜色$\kappa$执行\textbf{结晶}后的图形为
+				$$
+				\operatorname{Cry}_{\kappa}(S)\in\mathbb{S},
+				$$
+				其满足对任意$p\in I_S$，
+				$$
+				\bigl(\operatorname{Cry}_{\kappa}(S)\bigr)_p
+				=
+				\begin{cases}
+					(c,\kappa), & p\in R_S,\\
+					S_p, & p\notin R_S.
+				\end{cases}
+				$$
+			\end{definition}
+			
+			\begin{definition}[上色]
+				设$S\in\mathbb{S}$，$\kappa\in\mathbb{C}$为指定颜色。
+				定义$S$中可上色位置集合为
+				$$
+				P_S
+				=
+				\{p\in I_S\mid \tau_p\in\mathbb{T}\}.
+				$$
+				
+				若$P_S=\varnothing$，则定义
+				$$
+				\operatorname{Paint}_{\kappa}(S)=S.
+				$$
+				
+				若$P_S\neq\varnothing$，定义可上色的最顶层行号为
+				$$
+				\operatorname{top}_{\mathrm{paint}}(S)
+				=
+				\min\{i\mid \exists j,\ (i,j)\in P_S\}.
+				$$
+				定义最顶层可上色位置集合为
+				$$
+				P_S^{\mathrm{top}}
+				=
+				\{(i,j)\in P_S\mid i=\operatorname{top}_{\mathrm{paint}}(S)\}.
+				$$
+				
+				定义$S$以颜色$\kappa$执行\textbf{上色}后的图形为
+				$$
+				\operatorname{Paint}_{\kappa}(S)\in\mathbb{S},
+				$$
+				其满足对任意$p\in I_S$，若
+				$$
+				S_p=(\tau_p,\chi_p),
+				$$
+				则
+				$$
+				\bigl(\operatorname{Paint}_{\kappa}(S)\bigr)_p
+				=
+				\begin{cases}
+					(\tau_p,\kappa), & p\in P_S^{\mathrm{top}},\\
+					S_p, & p\notin P_S^{\mathrm{top}}.
+				\end{cases}
+				$$
+			\end{definition}
+			
+		\subsection{颜色无关性}
+			
+			\begin{definition}[块的空间结构]
+				定义块的\textbf{空间结构}为其类型分量。
+				即对块
+				$$
+				b=(\tau,\chi)\in\mathbb{B},
+				$$
+				定义
+				$$
+				\operatorname{sh}(b)=\tau.
+				$$
+			\end{definition}
+			
+			\begin{definition}[图形的空间结构]
+				设$S\in\mathbb{S}$。
+				定义$S$的\textbf{空间结构}为
+				$$
+				\operatorname{Sh}(S)
+				=
+				(\tau_p)_{p\in I_S}.
+				$$
+				也就是说，$\operatorname{Sh}(S)$仅记录每个位置处块的类型，而忘记其颜色。
+				
+				若$S,T\in\mathbb{S}$满足
+				$$
+				I_S=I_T
+				\quad\text{且}\quad
+				\operatorname{Sh}(S)=\operatorname{Sh}(T),
+				$$
+				则称$S$与$T$具有相同的\textbf{空间结构}，记作
+				$$
+				S\equiv_{\mathrm{sh}}T.
+				$$
+			\end{definition}
+			
+			\begin{proposition}[基础结构的颜色无关性]\label{prop:basic-shape-invariance}
+				设$S,T\in\mathbb{S}$，且
+				$$
+				S\equiv_{\mathrm{sh}}T.
+				$$
+				则以下对象在自然对应下相同：
+				$$
+				U_S=U_T,\qquad C_S=C_T,
+				$$
+				直接粘连关系、粘连连通关系、最大粘连组划分、支撑关系、支撑图、触地组、受支撑组以及可下落组均相同。
+			\end{proposition}
+			
+			\begin{proof}
+				这些对象的定义只涉及位置集合$I_S$、块类型$\tau_p$以及位置之间的邻接关系，
+				均不涉及颜色分量$\chi_p$。
+				由于$S\equiv_{\mathrm{sh}}T$意味着二者具有相同的位置集合与相同的类型分布，
+				故上述对象均相同。
+			\end{proof}
+			
+			\begin{proposition}[全局下落的颜色无关性]\label{prop:fall-shape-invariance}
+				若$S,T\in\mathbb{S}$满足
+				$$
+				S\equiv_{\mathrm{sh}}T,
+				$$
+				则
+				$$
+				\operatorname{Fall}(S)
+				\equiv_{\mathrm{sh}}
+				\operatorname{Fall}(T).
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				由\cref{prop:basic-shape-invariance}，$S$与$T$具有相同的最大粘连组、相同的可下落判断以及相同的下落状态转移结构。
+				一次下落$\Phi_G$只改变块的位置并删除类型为$c$的晶体块，其是否移动或删除只由类型分量决定，与颜色无关。
+				因此，从$S$与$T$出发的下落过程在空间结构层面逐步一致。
+				故终止后得到的图形空间结构相同。
+			\end{proof}
+			
+			\begin{proposition}[晶体破碎的颜色无关性]\label{prop:break-shape-invariance}
+				设$S,T\in\mathbb{S}$，且
+				$$
+				S\equiv_{\mathrm{sh}}T.
+				$$
+				则$C_S=C_T$。并且对任意$p\in C_S=C_T$，有
+				$$
+				\operatorname{Br}_p(S)
+				\equiv_{\mathrm{sh}}
+				\operatorname{Br}_p(T).
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				由\cref{prop:basic-shape-invariance}，$C_S=C_T$。
+				晶体相邻关系$\sim_S^c$只依赖于晶体位置集合和上下左右邻接关系，
+				因此$S$与$T$中的晶体簇划分相同。
+				于是对任意$p\in C_S=C_T$，有
+				$$
+				[p]^c_S=[p]^c_T.
+				$$
+				晶体破碎操作仅将该晶体簇中的位置置为空块，其余位置保持原类型不变。
+				故
+				$$
+				\operatorname{Br}_p(S)
+				\equiv_{\mathrm{sh}}
+				\operatorname{Br}_p(T).
+				$$
+			\end{proof}
+			
+			\begin{proposition}[置空操作的颜色无关性]\label{prop:emptying-shape-invariance}
+				设$S,T\in\mathbb{S}$，且
+				$$
+				S\equiv_{\mathrm{sh}}T.
+				$$
+				若$A\subseteq I_S=I_T$，则
+				$$
+				S\setminus A
+				\equiv_{\mathrm{sh}}
+				T\setminus A.
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				对任意$p\in A$，两边在$p$处均为空块$\mathbf{0}$，其类型均为$-$。
+				对任意$p\notin A$，两边分别保持$S_p$与$T_p$，而$S\equiv_{\mathrm{sh}}T$保证二者类型相同。
+				故置空后空间结构仍相同。
+			\end{proof}
+			
+			\begin{proposition}[超上限删除的颜色无关性]\label{prop:clip-shape-invariance}
+				设$S,T\in\mathbb{S}$，且
+				$$
+				S\equiv_{\mathrm{sh}}T.
+				$$
+				则对任意高度上限$\ell\in\mathbb{N}_{+}$，有
+				$$
+				\operatorname{Clip}_{\ell}(S)
+				\equiv_{\mathrm{sh}}
+				\operatorname{Clip}_{\ell}(T).
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				由$S\equiv_{\mathrm{sh}}T$可知二者高度、宽度相同，因此
+				$$
+				I_S=I_T,
+				\qquad
+				O_\ell(S)=O_\ell(T).
+				$$
+				又由\cref{prop:basic-shape-invariance}，有
+				$$
+				C_S=C_T.
+				$$
+				晶体簇划分只依赖晶体位置集合和上下左右邻接关系，因此对任意$p\in C_S=C_T$，
+				$$
+				[p]^c_S=[p]^c_T.
+				$$
+				于是超上限删除触发破碎的晶体位置集合相同：
+				$$
+				X_\ell(S)=X_\ell(T).
+				$$
+				因此两者被置空的位置集合相同。由\cref{prop:emptying-shape-invariance}可知，
+				置空后所得图形空间结构相同。
+				最后，$\operatorname{Clip}_\ell$只保留最下方相同数量的层，故最终输出图形仍具有相同空间结构。
+			\end{proof}
+			
+			\begin{proposition}[旋转的颜色无关性]\label{prop:rot-shape-invariance}
+				设$S,T\in\mathbb{S}$，且
+				$$
+				S\equiv_{\mathrm{sh}}T.
+				$$
+				则对任意$k\in\mathbb{Z}$，有
+				$$
+				\operatorname{Rot}_k(S)
+				\equiv_{\mathrm{sh}}
+				\operatorname{Rot}_k(T).
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				旋转操作只按固定规则重排位置上的块，不改变块的类型。
+				由于$S$与$T$在对应位置上类型相同，重排后对应位置上的类型仍相同。
+			\end{proof}
+			
+			\begin{proposition}[保留操作的颜色无关性]\label{prop:restriction-shape-invariance}
+				设$S,T\in\mathbb{S}$，且
+				$$
+				S\equiv_{\mathrm{sh}}T.
+				$$
+				若$A\subseteq I_S=I_T$，则
+				$$
+				S|_A\equiv_{\mathrm{sh}}T|_A.
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				由定义，
+				$$
+				S|_A=S\setminus(I_S\setminus A),
+				\qquad
+				T|_A=T\setminus(I_T\setminus A).
+				$$
+				由\cref{prop:emptying-shape-invariance}即得结论。
+			\end{proof}
+			
+			\begin{proposition}[东西拼接的颜色无关性]\label{prop:horizontal-glue-shape-invariance}
+				设$S_1,T_1,S_2,T_2\in\mathbb{S}$，且它们具有相同的高度和宽度。
+				若
+				$$
+				S_1\equiv_{\mathrm{sh}}T_1,
+				\qquad
+				S_2\equiv_{\mathrm{sh}}T_2,
+				$$
+				则
+				$$
+				S_1\sqcup S_2
+				\equiv_{\mathrm{sh}}
+				T_1\sqcup T_2.
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				东西拼接在西半边取第一个输入，在东半边取第二个输入。
+				由于对应输入在对应位置上的类型相同，拼接后对应位置上的类型也相同。
+			\end{proof}
+			
+			\begin{proposition}[切割的颜色无关性]\label{prop:cut-shape-invariance}
+				设$S,T\in\mathbb{S}$，且
+				$$
+				S\equiv_{\mathrm{sh}}T.
+				$$
+				记
+				$$
+				\operatorname{Cut}(S)=(S_{\mathrm W},S_{\mathrm E}),
+				\qquad
+				\operatorname{Cut}(T)=(T_{\mathrm W},T_{\mathrm E}).
+				$$
+				则
+				$$
+				S_{\mathrm W}\equiv_{\mathrm{sh}}T_{\mathrm W},
+				\qquad
+				S_{\mathrm E}\equiv_{\mathrm{sh}}T_{\mathrm E}.
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				切割直接触发的晶体位置集合$B_{\mathrm{cut}}$只由切割线两侧是否为晶体决定，
+				因此由空间结构决定。
+				又晶体簇划分只由晶体位置与邻接关系决定，故
+				$$
+				X_{\mathrm{cut}}(S)=X_{\mathrm{cut}}(T).
+				$$
+				由\cref{prop:emptying-shape-invariance}，
+				$$
+				S\setminus X_{\mathrm{cut}}(S)
+				\equiv_{\mathrm{sh}}
+				T\setminus X_{\mathrm{cut}}(T).
+				$$
+				再由\cref{prop:restriction-shape-invariance}，二者的西半边与东半边分别具有相同空间结构。
+				最后由\cref{prop:fall-shape-invariance}，分别执行全局下落后空间结构仍相同。
+				故切割输出的两个半边分别空间结构相同。
+			\end{proof}
+			
+			\begin{proposition}[半破的颜色无关性]\label{prop:half-shape-invariance}
+				设$S,T\in\mathbb{S}$，且
+				$$
+				S\equiv_{\mathrm{sh}}T.
+				$$
+				则
+				$$
+				\operatorname{Half}(S)
+				\equiv_{\mathrm{sh}}
+				\operatorname{Half}(T).
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				半破是切割后取东半边输出。
+				由\cref{prop:cut-shape-invariance}即得结论。
+			\end{proof}
+			
+			\begin{proposition}[交换的颜色无关性]\label{prop:swap-shape-invariance}
+				设$S_1,T_1,S_2,T_2\in\mathbb{S}$，且对应图形具有相同的高度和宽度。
+				若
+				$$
+				S_1\equiv_{\mathrm{sh}}T_1,
+				\qquad
+				S_2\equiv_{\mathrm{sh}}T_2,
+				$$
+				则$\operatorname{Swap}(S_1,S_2)$与$\operatorname{Swap}(T_1,T_2)$的两个输出图形分别具有相同空间结构。
+			\end{proposition}
+			
+			\begin{proof}
+				由\cref{prop:cut-shape-invariance}，两个输入分别切割后所得的对应西半边、东半边具有相同空间结构。
+				交换操作只是将这些半边交叉拼接。
+				再由\cref{prop:horizontal-glue-shape-invariance}，两个输出图形分别具有相同空间结构。
+			\end{proof}
+			
+			\begin{proposition}[上下拼接的颜色无关性]\label{prop:vertical-glue-shape-invariance}
+				设$S_1,T_1,S_2,T_2\in\mathbb{S}$，且
+				$$
+				\operatorname{wd}(S_1)=\operatorname{wd}(S_2),
+				\qquad
+				\operatorname{wd}(T_1)=\operatorname{wd}(T_2).
+				$$
+				若
+				$$
+				S_1\equiv_{\mathrm{sh}}T_1,
+				\qquad
+				S_2\equiv_{\mathrm{sh}}T_2,
+				$$
+				则
+				$$
+				S_1\mathbin{\Box}S_2
+				\equiv_{\mathrm{sh}}
+				T_1\mathbin{\Box}T_2.
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				上下拼接只是将第一个输入放在上方，第二个输入放在下方，并在中间加入一空层。
+				对应输入空间结构相同，而中间空层也相同，因此拼接后空间结构相同。
+			\end{proof}
+			
+			\begin{proposition}[堆叠的颜色无关性]\label{prop:stack-shape-invariance}
+				设$S_1,T_1,S_2,T_2\in\mathbb{S}$，且对应图形宽度相同。
+				若
+				$$
+				S_1\equiv_{\mathrm{sh}}T_1,
+				\qquad
+				S_2\equiv_{\mathrm{sh}}T_2,
+				$$
+				则对任意高度上限$\ell\in\mathbb{N}_{+}$，有
+				$$
+				\operatorname{Stack}_\ell(S_1,S_2)
+				\equiv_{\mathrm{sh}}
+				\operatorname{Stack}_\ell(T_1,T_2).
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				由\cref{prop:vertical-glue-shape-invariance}，
+				$$
+				S_1\mathbin{\Box}S_2
+				\equiv_{\mathrm{sh}}
+				T_1\mathbin{\Box}T_2.
+				$$
+				由\cref{prop:fall-shape-invariance}，第一次全局下落后空间结构仍相同。
+				由\cref{prop:clip-shape-invariance}，超上限删除后空间结构仍相同。
+				再由\cref{prop:fall-shape-invariance}，第二次全局下落后空间结构仍相同。
+				故堆叠结果具有相同空间结构。
+			\end{proof}
+			
+			\begin{proposition}[结晶的空间结构相容性]\label{prop:cry-shape-compatibility}
+				设$S,T\in\mathbb{S}$，且
+				$$
+				S\equiv_{\mathrm{sh}}T.
+				$$
+				则对任意$\kappa,\lambda\in\mathbb{C}$，有
+				$$
+				\operatorname{Cry}_{\kappa}(S)
+				\equiv_{\mathrm{sh}}
+				\operatorname{Cry}_{\lambda}(T).
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				由$S\equiv_{\mathrm{sh}}T$可知二者具有相同的最上方非空层，
+				因此对应的区域$A_S,A_T$在自然对应下相同。
+				需要被结晶替换的位置集合
+				$$
+				R_S=\{p\in A_S\mid S_p=\mathbf{0}\ \text{或}\ \tau_p=P\}
+				$$
+				只依赖空间结构，因此$R_S=R_T$。
+				对$p\in R_S=R_T$，两侧输出的类型均为$c$；
+				对$p\notin R_S$，两侧保持原类型，而原类型相同。
+				故结论成立。
+			\end{proof}
+			
+			\begin{proposition}[结晶颜色无关性]\label{prop:cry-color-independence}
+				设$S\in\mathbb{S}$，$\kappa,\lambda\in\mathbb{C}$。
+				则
+				$$
+				\operatorname{Cry}_{\kappa}(S)
+				\equiv_{\mathrm{sh}}
+				\operatorname{Cry}_{\lambda}(S).
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				结晶操作中，需要被替换的位置集合
+				$$
+				R_S
+				=
+				\{p\in A_S\mid S_p=\mathbf{0}\ \text{或}\ \tau_p=P\}
+				$$
+				只依赖于$S$的空间结构，与指定颜色无关。
+				对任意$p\in R_S$，无论指定颜色为$\kappa$还是$\lambda$，替换后的块类型均为$c$。
+				对任意$p\notin R_S$，两种操作均保持原块不变。
+				因此二者在每个位置上的类型分量相同，即
+				$$
+				\operatorname{Cry}_{\kappa}(S)
+				\equiv_{\mathrm{sh}}
+				\operatorname{Cry}_{\lambda}(S).
+				$$
+			\end{proof}
+			
+			\begin{proposition}[上色的空间结构相容性]\label{prop:paint-shape-compatibility}
+				设$S,T\in\mathbb{S}$，且
+				$$
+				S\equiv_{\mathrm{sh}}T.
+				$$
+				则对任意$\kappa,\lambda\in\mathbb{C}$，有
+				$$
+				\operatorname{Paint}_{\kappa}(S)
+				\equiv_{\mathrm{sh}}
+				\operatorname{Paint}_{\lambda}(T).
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				上色操作不改变任何位置处块的类型分量，只改变颜色分量。
+				因此
+				$$
+				\operatorname{Sh}(\operatorname{Paint}_{\kappa}(S))
+				=
+				\operatorname{Sh}(S),
+				\qquad
+				\operatorname{Sh}(\operatorname{Paint}_{\lambda}(T))
+				=
+				\operatorname{Sh}(T).
+				$$
+				又$S\equiv_{\mathrm{sh}}T$，故结论成立。
+			\end{proof}
+			
+			\begin{proposition}[上色颜色无关性]\label{prop:paint-color-independence}
+				设$S\in\mathbb{S}$，$\kappa,\lambda\in\mathbb{C}$。
+				则
+				$$
+				\operatorname{Paint}_{\kappa}(S)
+				\equiv_{\mathrm{sh}}
+				\operatorname{Paint}_{\lambda}(S).
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				上色操作只将最顶层可上色位置中块的颜色分量替换为指定颜色，
+				不改变任何位置处块的类型分量。
+				因此对任意$\kappa,\lambda\in\mathbb{C}$，
+				$$
+				\operatorname{Sh}(\operatorname{Paint}_{\kappa}(S))
+				=
+				\operatorname{Sh}(S)
+				=
+				\operatorname{Sh}(\operatorname{Paint}_{\lambda}(S)).
+				$$
+				故
+				$$
+				\operatorname{Paint}_{\kappa}(S)
+				\equiv_{\mathrm{sh}}
+				\operatorname{Paint}_{\lambda}(S).
+				$$
+			\end{proof}
+			
+			\begin{theorem}[机器操作的颜色无关性]\label{thm:machine-shape-invariance}
+				所有已定义的机器操作在空间结构意义下均与颜色无关。
+				也就是说，若各输入图形分别具有相同的空间结构，则无论结晶、上色操作选取何种颜色参数，对应输出图形仍具有相同的空间结构。
+			\end{theorem}
+			
+			\begin{proof}
+				旋转由\cref{prop:rot-shape-invariance}给出；
+				切割、半破、交换分别由
+				\cref{prop:cut-shape-invariance,prop:half-shape-invariance,prop:swap-shape-invariance}给出；
+				堆叠由\cref{prop:stack-shape-invariance}给出；
+				结晶与上色分别由
+				\cref{prop:cry-shape-compatibility,prop:paint-shape-compatibility}给出。
+				故所有已定义机器操作均满足颜色无关性。
+			\end{proof}
+			
 \end{document}
