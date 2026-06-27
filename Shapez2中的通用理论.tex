@@ -2006,4 +2006,231 @@
 				故所有已定义机器操作均满足颜色无关性。
 			\end{proof}
 			
+		\subsection{可制作图形与制作路径}
+			
+			\begin{definition}[机器操作族]
+				一个\textbf{机器操作}是一个有限输入、有限输出的部分映射
+				$$
+				M:\operatorname{Dom}(M)\subseteq \mathbb{S}^{a(M)}
+				\longrightarrow
+				\mathbb{S}^{b(M)},
+				$$
+				其中$a(M),b(M)\in\mathbb{N}_{+}$分别称为$M$的输入元数和输出元数。
+				
+				本文记$\mathfrak{M}$为由下列机器操作构成的集合：
+				\begin{itemize}
+					\item 旋转：
+					$$
+					\operatorname{Rot}_k:\mathbb{S}\to\mathbb{S},
+					\qquad k\in\mathbb{Z};
+					$$
+					\item 切割：
+					$$
+					\operatorname{Cut}:\mathbb{S}\to\mathbb{S}^2;
+					$$
+					\item 半破：
+					$$
+					\operatorname{Half}:\mathbb{S}\to\mathbb{S};
+					$$
+					\item 交换：
+					$$
+					\operatorname{Swap}:\operatorname{Dom}(\operatorname{Swap})\subseteq\mathbb{S}^2\to\mathbb{S}^2;
+					$$
+					\item 堆叠：
+					$$
+					\operatorname{Stack}_\ell:\operatorname{Dom}(\operatorname{Stack}_\ell)\subseteq\mathbb{S}^2\to\mathbb{S},
+					\qquad \ell\in\mathbb{N}_{+};
+					$$
+					\item 结晶：
+					$$
+					\operatorname{Cry}_{\kappa}:\mathbb{S}\to\mathbb{S},
+					\qquad \kappa\in\mathbb{C};
+					$$
+					\item 上色：
+					$$
+					\operatorname{Paint}_{\kappa}:\mathbb{S}\to\mathbb{S},
+					\qquad \kappa\in\mathbb{C}.
+					$$
+				\end{itemize}
+			\end{definition}
+			
+			\begin{definition}[可制作图形]
+				设$\mathcal{I}\subseteq\mathbb{S}$为初始图形集合。
+				定义由$\mathcal{I}$生成的\textbf{可制作图形集合}
+				$$
+				\operatorname{Make}(\mathcal{I})
+				$$
+				为满足以下条件的最小子集$\mathcal{M}\subseteq\mathbb{S}$：
+				\begin{enumerate}
+					\item
+					$$
+					\mathcal{I}\subseteq\mathcal{M};
+					$$
+					
+					\item 对任意$M\in\mathfrak{M}$，若
+					$$
+					(S_1,\dots,S_{a(M)})\in \operatorname{Dom}(M)\cap \mathcal{M}^{a(M)}
+					$$
+					且
+					$$
+					M(S_1,\dots,S_{a(M)})
+					=
+					(T_1,\dots,T_{b(M)}),
+					$$
+					则
+					$$
+					T_1,\dots,T_{b(M)}\in\mathcal{M}.
+					$$
+				\end{enumerate}
+				
+				若$S\in\operatorname{Make}(\mathcal{I})$，则称$S$是从$\mathcal{I}$出发\textbf{可制作的}。
+			\end{definition}
+			
+			\begin{definition}[制作单位元]
+				对任意实体类型$\tau\in\mathbb{T}$、颜色$\chi\in\mathbb{C}$以及偶数宽度$w$，定义
+				$$
+				E_{\tau,\chi}^{(w,j)}\in\mathbb{B}^{1\times w}
+				$$
+				为满足
+				$$
+				\left(E_{\tau,\chi}^{(w,j)}\right)_{(1,j)}
+				=
+				(\tau,\chi),
+				\qquad
+				\left(E_{\tau,\chi}^{(w,j)}\right)_{(1,j')}
+				=
+				\mathbf{0}
+				\quad(j'\neq j)
+				$$
+				的图形，其中$1\leq j\leq w$。
+				
+				称$E_{\tau,\chi}^{(w,j)}$为一个\textbf{制作单位元}。
+				所有制作单位元构成的集合记为
+				$$
+				\mathcal{E}
+				=
+				\{E_{\tau,\chi}^{(w,j)}
+				\mid
+				\tau\in\mathbb{T},\ \chi\in\mathbb{C},\ 2\mid w,\ 1\leq j\leq w\}.
+				$$
+			\end{definition}
+			
+			\begin{definition}[制作路径]
+				设$\mathcal{I}\subseteq\mathbb{S}$为初始图形集合。
+				一条从$\mathcal{I}$出发的\textbf{制作路径}是一个有限序列
+				$$
+				\Pi=(\mathcal{S}_0,\mathcal{S}_1,\dots,\mathcal{S}_n),
+				$$
+				其中每个$\mathcal{S}_r\subseteq\mathbb{S}$为有限集合，并满足：
+				\begin{enumerate}
+					\item
+					$$
+					\mathcal{S}_0\subseteq\mathcal{I}.
+					$$
+					
+					\item 对每个$r=0,\dots,n-1$，存在机器操作
+					$$
+					M_r\in\mathfrak{M},
+					$$
+					以及输入元组
+					$$
+					\mathbf{S}_r=(S_{r,1},\dots,S_{r,a(M_r)})\in \mathcal{S}_r^{a(M_r)}
+					$$
+					使得
+					$$
+					\mathbf{S}_r\in\operatorname{Dom}(M_r).
+					$$
+					若
+					$$
+					M_r(\mathbf{S}_r)
+					=
+					(T_{r,1},\dots,T_{r,b(M_r)}),
+					$$
+					则
+					$$
+					\mathcal{S}_{r+1}
+					=
+					\mathcal{S}_r
+					\cup
+					\{T_{r,1},\dots,T_{r,b(M_r)}\}.
+					$$
+				\end{enumerate}
+				
+				若$S\in\mathcal{S}_n$，则称制作路径$\Pi$\textbf{制作出}$S$。
+			\end{definition}
+			
+			\begin{proposition}[制作路径刻画可制作性]\label{prop:make-path-characterization}
+				设$\mathcal{I}\subseteq\mathbb{S}$，$S\in\mathbb{S}$。
+				则
+				$$
+				S\in\operatorname{Make}(\mathcal{I})
+				$$
+				当且仅当存在一条从$\mathcal{I}$出发并制作出$S$的制作路径。
+			\end{proposition}
+			
+			\begin{proof}
+				由$\operatorname{Make}(\mathcal{I})$作为包含$\mathcal{I}$且对$\mathfrak{M}$中所有机器操作封闭的最小集合的定义可知。
+				
+				具体地，任意制作路径中的每一步都只是在当前集合中加入某个机器操作的输出，
+				因此制作路径所得到的图形均属于$\operatorname{Make}(\mathcal{I})$。
+				反过来，$\operatorname{Make}(\mathcal{I})$中的每个图形都可由有限次应用上述闭包规则得到，
+				这些有限次应用按顺序排列即给出一条制作路径。
+			\end{proof}
+			
+			\begin{theorem}[制作路径的颜色无关性]\label{thm:production-path-color-independence}
+				设
+				$$
+				\Pi=(\mathcal{S}_0,\dots,\mathcal{S}_n),
+				\qquad
+				\Pi'=(\mathcal{S}'_0,\dots,\mathcal{S}'_n)
+				$$
+				为两条制作路径。
+				假设二者在第$r$步使用的机器操作分别为$M_r$与$M'_r$，且满足：
+				\begin{enumerate}
+					\item 初始集合中的对应图形具有相同空间结构；
+					\item 对每个$r=0,\dots,n-1$，$M_r$与$M'_r$除结晶、上色的颜色参数外具有相同的机器类型与相同的非颜色参数；
+					\item 对每个$r=0,\dots,n-1$，两条路径在第$r$步选取的输入图形一一对应，且对应输入图形具有相同空间结构。
+				\end{enumerate}
+				则对每个$r=0,\dots,n$，$\mathcal{S}_r$与$\mathcal{S}'_r$中的对应图形具有相同空间结构。
+				特别地，若$S$与$S'$为两条路径对应的最终输出，则
+				$$
+				S\equiv_{\mathrm{sh}}S'.
+				$$
+			\end{theorem}
+			
+			\begin{proof}
+				对$r$作归纳。
+				当$r=0$时，结论由假设成立。
+				
+				假设第$r$步时对应图形具有相同空间结构。
+				两条路径在第$r$步选取的输入图形一一对应，且对应输入图形具有相同空间结构。
+				由\cref{thm:machine-shape-invariance}，对应机器操作的输出图形也具有相同空间结构。
+				因此将这些输出并入当前集合后，第$r+1$步的对应图形仍具有相同空间结构。
+				
+				由归纳法，结论对所有$r=0,\dots,n$成立。
+			\end{proof}
+			
+			\begin{corollary}[可制作空间结构的颜色无关性]\label{cor:make-shape-color-independence}
+				设两组初始图形集合$\mathcal{I},\mathcal{I}'\subseteq\mathbb{S}$在空间结构上一一对应。
+				若$S\in\operatorname{Make}(\mathcal{I})$，则存在
+				$$
+				S'\in\operatorname{Make}(\mathcal{I}')
+				$$
+				使得
+				$$
+				S\equiv_{\mathrm{sh}}S',
+				$$
+				其中制作过程中结晶与上色所用颜色参数可任意替换。
+			\end{corollary}
+			
+			\begin{proof}
+				由\cref{prop:make-path-characterization}，存在一条从$\mathcal{I}$制作出$S$的制作路径。
+				在$\mathcal{I}'$中选取空间结构对应的初始图形，并使用相同操作骨架构造制作路径，
+				其中结晶和上色的颜色参数任意指定。
+				由\cref{thm:production-path-color-independence}，最终得到的图形$S'$满足
+				$$
+				S\equiv_{\mathrm{sh}}S'.
+				$$
+			\end{proof}
+			
 \end{document}
