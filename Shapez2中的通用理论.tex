@@ -70,12 +70,17 @@
 	
 	\tableofcontents
 	
-	\section{基础定义}
-		
-		本章在游戏底层代码逻辑的基础上进行抽象，给出游戏机制的符号定义和命题。
+	\section{基础机制}
+	
+		本章在游戏底层规则的基础上，对图形、块、粘连、支撑、下落以及机器操作进行形式化建模。
 		
 		\subsection{块与图形}
-	
+			
+			游戏中的图形由若干个格子组成，每个格子中至多放置一个块。
+			一个块需要同时记录两个信息：其类型以及颜色。
+			其中类型决定了块在粘连、支撑、下落等机制中的行为，而颜色主要用于染色、结晶等机器操作。
+			因此我们首先给出块与图形的基本集合论定义。
+			
 			\begin{definition}[块]
 				记
 				$$
@@ -115,6 +120,10 @@
 				为\textbf{空块}。
 			\end{definition}
 			
+			有了单个块的定义后，一个图形便可以看作由块填充的有限矩阵。
+			本文约定矩阵的第$1$行位于最上方，行号自上而下递增。
+			这一约定会在下落、支撑以及超上限删除等定义中反复使用。
+			
 			\begin{definition}[图形]
 				设$\mathbb{B}$为所有块构成的集合。一个\textbf{图形}是一个矩阵
 				$$
@@ -149,7 +158,11 @@
 				\mathbb{B}^{h\times w}.
 				$$
 			\end{definition}
-		
+			
+			在后续讨论中，我们经常需要只关注图形中的某些特殊位置。
+			例如，粘连和支撑只发生在非空块之间，而晶体破碎只与晶体所在的位置有关。
+			因此下面引入非空位置集合与晶体位置集合。
+			
 			\begin{definition}[非空位置与晶体位置]
 				设$S\in\mathbb{S}$。
 				定义$S$中的非空位置集合为
@@ -161,6 +174,9 @@
 				C_S=\{p\in I_S\mid \tau_p=c\}.
 				$$
 			\end{definition}
+			
+			许多机器操作会删除一部分块，例如晶体破碎、切割触发破碎以及超上限删除。
+			为了统一描述这类操作，我们先定义一个基本的置空操作。
 			
 			\begin{definition}[置空]
 				设$S\in\mathbb{S}$，$A\subseteq I_S$。
@@ -181,6 +197,14 @@
 			
 		\subsection{粘连与支撑}
 		
+			粘连是决定图形整体运动方式的核心机制。
+			若若干块通过粘连关系连成一体，则它们在下落过程中会作为一个整体被处理。
+			另一方面，支撑关系刻画了一个块或粘连组是否阻挡另一个块或粘连组下落。
+			因此本节先定义块之间的直接粘连，再由此得到最大粘连组，随后定义块与粘连组之间的支撑关系。
+			
+			在游戏规则中，普通形状与晶体在水平方向相邻时会粘连，而垂直方向上只有晶体与晶体之间会粘连。
+			顶针虽然是非空块，但不与任何块发生粘连。
+			
 			\begin{definition}[直接粘连]
 				设$S\in\mathbb{S}$。
 				记
@@ -206,6 +230,10 @@
 				\end{enumerate}
 				特别地，顶针$P$不与任何其他块直接粘连。
 			\end{definition}
+			
+			直接粘连只描述相邻两个块之间的局部关系。
+			实际下落时，需要考虑由若干次直接粘连传递形成的整体。
+			因此下面将直接粘连关系取传递闭包，得到粘连连通关系与最大粘连组。
 			
 			\begin{definition}[粘连路径、粘连组与最大粘连组]
 				设$S\in\mathbb{S}$。
@@ -235,6 +263,10 @@
 				由于顶针$P$不与任何其他块直接粘连，因此顶针所在的最大粘连组总是单点集。
 			\end{definition}
 			
+			最大粘连组描述了哪些块会作为一个整体运动。
+			接下来需要判断这些整体是否能够下落。
+			为此，我们先在单个块之间定义支撑关系，再将其提升到最大粘连组之间。
+			
 			\begin{definition}[块的支撑关系]
 				设$S\in\mathbb{S}$。
 				对任意$p=(i,j),q=(i',j')\in U_S$，称位置$p$处的块\textbf{支撑}位置$q$处的块，记作
@@ -258,6 +290,10 @@
 				\end{enumerate}
 			\end{definition}
 			
+			块的支撑关系是局部的。
+			若一个最大粘连组中的某个块支撑另一个最大粘连组中的某个块，则可认为前一个粘连组支撑后一个粘连组。
+			这给出了粘连组层面的支撑关系。
+			
 			\begin{definition}[最大粘连组的支撑关系]
 				设$S\in\mathbb{S}$，且$G,H\in \mathcal{G}(S)$为$S$中的两个最大粘连组。
 				称$G$\textbf{支撑}着$H$，记作
@@ -273,7 +309,11 @@
 				p\preceq_S q.
 				$$
 			\end{definition}	
-						
+			
+			为了研究多个最大粘连组之间的支撑依赖关系，可以将最大粘连组视为顶点，将直接支撑关系视为有向边。
+			这样得到的有向图称为支撑图。
+			支撑图不仅用于判断下落，还可以描述循环支撑等特殊结构。
+			
 			\begin{definition}[支撑图]
 				设$S\in\mathbb{S}$。
 				定义$S$的\textbf{支撑图}为有向图
@@ -297,6 +337,10 @@
 				$$
 			\end{definition}
 			
+			支撑图中的一条有向边表示一步直接支撑。
+			若沿着若干条支撑边可以从一个粘连组到达另一个粘连组，则表示支撑影响可以沿路径向上传播。
+			因此引入支撑路径的概念。
+			
 			\begin{definition}[支撑路径]
 				设$S\in\mathbb{S}$，令$\Gamma_S=(\mathcal{G}(S),E_S)$为$S$的支撑图。
 				
@@ -316,6 +360,10 @@
 				G\leadsto_S H.
 				$$
 			\end{definition}
+			
+			在通常情况下，支撑关系可以理解为从下方向上方传播的依赖关系。
+			然而游戏机制中可能出现若干最大粘连组相互支撑的情况。
+			这种结构会导致它们没有任何一个能首先下落，从而形成所谓的循环支撑结构。
 			
 			\begin{definition}[循环支撑结构]
 				设$S\in\mathbb{S}$，令$\Gamma_S=(\mathcal{G}(S),E_S)$为$S$的支撑图。
@@ -337,6 +385,10 @@
 				
 				等价地，循环支撑结构是支撑图$\Gamma_S$中的一个有向环。
 			\end{definition}
+			
+			单个有向环描述了一个具体的循环支撑现象。
+			为了在图论上统一处理所有互相可达的循环支撑组，我们进一步引入循环支撑分量。
+			它对应支撑图中含有有向环的强连通分量。
 			
 			\begin{definition}[循环支撑分量]
 				设$S\in\mathbb{S}$，令$\Gamma_S=(\mathcal{G}(S),E_S)$为$S$的支撑图。
@@ -370,6 +422,14 @@
 			
 		\subsection{下落过程}
 		
+			下落是游戏中最重要的动态机制之一。
+			由于粘连关系的存在，图形并不是以单个块为单位下落，而是以最大粘连组为单位下落。
+			一个最大粘连组能否下落，取决于它是否触底以及下方是否存在其他非空块阻挡。
+			本节首先定义单个最大粘连组的一次下落，随后用队列状态转移刻画完整的全局下落过程。
+			
+			约定下落方向为行号增加的方向。
+			因此若位置$p=(i,j)$处的块下落一层，则其目标位置为$(i+1,j)$。
+			
 			\begin{definition}[可下落]
 				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$为$S$中的一个最大粘连组。
 				记
@@ -392,6 +452,10 @@
 				
 				等价地，$G$可以下落一层，当且仅当$G$中的每个块向下平移一格后，均不会越界，也不会与$G$之外的任何非空块发生冲突。
 			\end{definition}
+			
+			可下落性只判断一个最大粘连组是否能够整体向下平移一层。
+			若该判断为真，则可以定义实际的一次下落操作。
+			根据游戏规则，最大粘连组下落时，其中的晶体会被删除，而非晶体块则向下移动一层。
 			
 			\begin{definition}[一次下落]
 				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$，且$G$在$S$中可以下落一层。
@@ -418,6 +482,10 @@
 				也就是说，$G$中的非晶体块整体下落一层，$G$中的晶体块被删除，其他位置保持不变。
 			\end{definition}
 			
+			一次下落之后，原最大粘连组中的晶体被删除，剩余的非晶体部分可能不再保持粘连连通。
+			因此需要在下落后的图形中重新识别这些剩余部分形成的最大粘连组。
+			这些新形成的组将在后续下落过程中继续被处理。
+			
 			\begin{definition}[下落后继组]
 				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$，且$G$在$S$中可以下落一层。
 				记
@@ -442,6 +510,10 @@
 				也就是说，$\operatorname{Succ}_S(G)$由$G$下落并删除晶体后剩余部分在新图形中形成的最大粘连组组成。
 			\end{definition}
 			
+			全局下落过程需要反复检查当前图形中的最大粘连组。
+			为了形式化“逐个检查”的过程，我们引入队列规则。
+			队列规则只决定最大粘连组被检查的顺序；后文将证明最终下落结果与该顺序无关。
+			
 			\begin{definition}[队列规则]
 				一个\textbf{队列规则}是指对任意图形$S\in\mathbb{S}$，给出一个映射
 				$$
@@ -456,6 +528,9 @@
 				队列$\omega_S(\mathcal{A})$中的元素恰好为$\mathcal{A}$中的所有元素，且每个元素出现一次。
 			\end{definition}
 			
+			为了避免将全局下落过程写成非形式化算法，我们把它描述为状态转移系统。
+			一个下落状态由当前图形、待检查队列以及当前轮次是否发生过下落的标记组成。
+			
 			\begin{definition}[下落状态]
 				一个\textbf{下落状态}是一个三元组
 				$$
@@ -468,6 +543,10 @@
 					\item $f\in\{\mathrm{false},\mathrm{true}\}$表示当前轮次中是否已经发生过下落。
 				\end{itemize}
 			\end{definition}
+			
+			下落状态转移描述了全局下落过程中的一步计算。
+			若队列非空，则取出队首最大粘连组并判断其是否可下落；
+			若队列为空，则根据本轮是否发生过下落决定终止或重新开始新一轮。
 			
 			\begin{definition}[下落状态转移]
 				设$\omega$为一个队列规则。
@@ -524,7 +603,10 @@
 					\end{enumerate}
 				\end{enumerate}
 			\end{definition}
-								
+			
+			给定队列规则后，从任意初始图形出发，下落状态转移会生成一条状态序列。
+			如果该序列在有限步后终止，则终止状态中的图形就是该队列规则下的全局下落结果。
+			
 			\begin{definition}[由队列规则诱导的全局下落映射]
 				设$\omega$为一个队列规则，设$S\in\mathbb{S}$。
 				定义初始下落状态为
@@ -556,7 +638,30 @@
 				$$
 				称$\operatorname{Fall}_{\omega}$为由队列规则$\omega$诱导的\textbf{全局下落映射}。
 			\end{definition}
-						
+			
+			为了后续分析可下落性的传播规律，我们引入两个辅助概念。
+			触地组由于已经到达图形底部而不能继续下落；
+			受支撑组则由于下方存在其他最大粘连组阻挡而不能在当前状态下直接下落。
+			
+			\begin{definition}[触地组与受支撑组]
+				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$。
+				若
+				$$
+				G^\downarrow\not\subseteq I_S,
+				$$
+				则称$G$在$S$中\textbf{触地}。
+				
+				若存在$H\in\mathcal{G}(S)$，$H\neq G$，使得
+				$$
+				H\to_S G,
+				$$
+				则称$G$在$S$中\textbf{受支撑}。
+			\end{definition}
+			
+			根据可下落的原始定义，一个最大粘连组无法下落只有两类原因：
+			要么其下移后会超出图形底部，要么其下移目标位置被组外非空块占据。
+			这正对应触地与受支撑两个概念。
+			
 			\begin{proposition}[可下落的等价刻画]\label{prop:fallable-characterization}
 				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$。
 				则$G$在$S$中可以下落一层，当且仅当$G$既不触地，也不受支撑。
@@ -603,6 +708,10 @@
 				综上，$G$可下落当且仅当$G$既不触地，也不受支撑。
 			\end{proof}
 			
+			接下来考虑不同最大粘连组的下落顺序是否会影响最终结果。
+			关键观察是：一个可下落组执行一次下落时，不会使其他原本不受支撑的外部组突然变为受支撑。
+			换言之，一次下落不会新增指向外部组的阻挡关系。
+			
 			\begin{proposition}[一次下落不新增外部受支撑关系]\label{prop:no-new-external-support}
 				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$，且$G$在$S$中可以下落一层。
 				记
@@ -633,6 +742,9 @@
 				于是$H$在$S'$中不受支撑。
 			\end{proof}
 			
+			由上述性质可知，如果两个最大粘连组在同一状态下都可以下落，那么先下落其中一个不会破坏另一个的可下落性。
+			这给出了可下落组之间的保持性。
+			
 			\begin{proposition}[可下落组的保持性]\label{prop:fallable-preservation}
 				设$S\in\mathbb{S}$，$G,H\in\mathcal{G}(S)$，且$G\neq H$。
 				若$G$与$H$在$S$中都可以下落一层，则$H$在$\Phi_G(S)$中仍可以下落一层。
@@ -653,6 +765,9 @@
 				
 				再由\cref{prop:fallable-characterization}可知，$H$在$S'$中仍可以下落一层。
 			\end{proof}
+			
+			进一步地，两个同时可下落的最大粘连组不仅不会互相阻止，而且它们的一次下落操作可以交换顺序。
+			这一交换律是证明队列顺序无关性的核心。
 			
 			\begin{proposition}[可下落组的一次下落交换律]\label{prop:fall-commutation}
 				设$S\in\mathbb{S}$，$G,H\in\mathcal{G}(S)$，且$G\neq H$。
@@ -691,6 +806,9 @@
 				$$
 			\end{proof}
 			
+			在讨论队列顺序无关性之前，还需要确认全局下落过程确实会在有限步后结束。
+			由于图形高度有限，非晶体块能够下落的总次数有限，而晶体块被删除的次数也有限，因此下落过程必然终止。
+			
 			\begin{proposition}[下落过程的终止性]\label{prop:fall-termination}
 				设$\omega$为任意队列规则。
 				对任意图形$S\in\mathbb{S}$，从初始状态$\Sigma_0^\omega(S)$出发的下落状态转移过程
@@ -712,7 +830,11 @@
 				在两次实际下落之间，队列长度有限；若处理到不可下落组，则队列长度减少$1$；若处理到可下落组，则发生一次实际下落。
 				由于实际下落次数有限，而每段不发生实际下落的队列处理次数也有限，故整个状态转移过程只能进行有限步。
 			\end{proof}
-						
+			
+			终止性保证了每个队列规则都会给出一个有限的下落结果。
+			接下来证明，该结果事实上与队列中最大粘连组的检查顺序无关。
+			直观上，这是因为同时可下落的组的一次下落操作可以交换，而不可下落的组只会被跳过。
+			
 			\begin{proposition}[队列顺序无关性]\label{prop:queue-independence}
 				设$\omega_1,\omega_2$为任意两个队列规则。
 				则对任意图形$S\in\mathbb{S}$，都有
@@ -744,6 +866,9 @@
 				$$
 			\end{proof}
 			
+			由队列顺序无关性可知，虽然全局下落过程的中间状态可能依赖队列规则，但最终得到的图形并不依赖队列规则。
+			因此可以去掉队列规则下标，定义唯一的全局下落映射。
+			
 			\begin{definition}[全局下落映射]
 				由\cref{prop:queue-independence}，$\operatorname{Fall}_{\omega}(S)$与队列规则$\omega$无关。
 				因此定义
@@ -758,6 +883,9 @@
 				为\textbf{全局下落映射}。
 			\end{definition}
 			
+			全局下落映射描述了图形在重力机制作用下达到的结果。
+			若一个图形经过全局下落后保持不变，则说明其中没有任何最大粘连组能够继续下落。
+			这样的图形称为稳定图形。
 			
 			\begin{definition}[稳定图形]
 				设$\operatorname{Fall}:\mathbb{S}\to\mathbb{S}$为全局下落映射。
@@ -773,21 +901,18 @@
 				\{S\in\mathbb{S}\mid \operatorname{Fall}(S)=S\}.
 				$$
 			\end{definition}
+					
+		\subsection{下落过程的不动点刻画}
 			
-			\begin{definition}[触地组与受支撑组]
-				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$。
-				若
-				$$
-				G^\downarrow\not\subseteq I_S,
-				$$
-				则称$G$在$S$中\textbf{触地}。
-				
-				若存在$H\in\mathcal{G}(S)$，$H\neq G$，使得
-				$$
-				H\to_S G,
-				$$
-				则称$G$在$S$中\textbf{受支撑}。
-			\end{definition}
+			上一节通过队列状态转移定义了全局下落过程。
+			这种定义贴近游戏执行逻辑，但在分析图形结构时并不总是方便。
+			本节给出下落过程的一个静态刻画：将最大粘连组视为支撑图中的顶点，通过支撑关系从触地组开始向上传播不可下落性。
+			在存在循环支撑结构时，循环中的最大粘连组也会由于相互支撑而保持不动。
+			这一现象可以用支撑闭包算子的不动点统一描述。
+			
+			若一批最大粘连组已经确定不会下落，则它们直接支撑的最大粘连组也不会首先下落。
+			因此，可以从触地组出发，沿支撑边不断向上传播“不可下落”的性质。
+			下面的支撑闭包算子正是对这一传播过程的形式化。
 			
 			\begin{definition}[支撑闭包算子]
 				设$S\in\mathbb{S}$。
@@ -812,6 +937,9 @@
 				$$
 				称$\Theta_S$为$S$的\textbf{支撑闭包算子}。
 			\end{definition}
+			
+			支撑闭包算子具有明显的单调性：若初始认为不可下落的最大粘连组越多，则经过一次支撑传播后得到的集合也只会越大。
+			这一性质保证了后面通过迭代定义最小不动点和最大不动点是合理的。
 			
 			\begin{proposition}[支撑闭包算子的单调性]
 				设$S\in\mathbb{S}$。
@@ -846,6 +974,10 @@
 				\Theta_S(\mathcal{X})\subseteq \Theta_S(\mathcal{Y}).
 				$$
 			\end{proof}
+			
+			由于图形中的最大粘连组数量有限，反复迭代支撑闭包算子必然在有限步后稳定。
+			从空集出发得到的是最小不动点，它描述了由触地组向上支撑传播得到的最小不可下落集合；
+			从全集出发得到的是最大不动点，它还会保留由循环支撑结构产生的不可下落部分。
 			
 			\begin{definition}[支撑不动点]
 				设$S\in\mathbb{S}$，令$\Theta_S$为$S$的支撑闭包算子。
@@ -883,6 +1015,10 @@
 				为$\Theta_S$的\textbf{最大不动点}。
 			\end{definition}
 			
+			在没有循环支撑结构的情况下，支撑图是有向无环图。
+			此时不可下落性只能从触地组向上传播，不会凭空由循环支撑产生。
+			因此最小不动点与最大不动点应当一致。
+			
 			\begin{proposition}[无循环支撑时不动点唯一]
 				设$S\in\mathbb{S}$。
 				若支撑图$\Gamma_S$中不存在循环支撑结构，则
@@ -912,6 +1048,10 @@
 				$$
 			\end{proof}
 			
+			当支撑图中存在有向环时，情况会发生变化。
+			环中的最大粘连组可能互相支撑，使得没有任何一个组能够首先下落。
+			这类由于循环支撑导致的不可下落部分，需要从支撑图中单独提取出来。
+			
 			\begin{definition}[循环支撑核]
 				设$S\in\mathbb{S}$。
 				定义$S$的\textbf{循环支撑核}为
@@ -921,6 +1061,10 @@
 				\{G\in\mathcal{G}(S)\mid G\text{属于某个循环支撑结构}\}.
 				$$
 			\end{definition}
+			
+			循环支撑核记录了所有处在循环支撑结构中的最大粘连组。
+			这些组本身不会下落，而它们向上支撑到的最大粘连组也会随之保持不动。
+			因此最大不动点应当由触地组、循环支撑核以及它们沿支撑关系向上可达的所有组组成。
 			
 			\begin{proposition}[最大不动点的循环刻画]
 				设$S\in\mathbb{S}$。
@@ -971,6 +1115,9 @@
 				$$
 			\end{proof}
 			
+			由上述刻画可知，最大不动点正好描述了在静态支撑图中应当保持不动的最大粘连组。
+			因此我们将其作为静态不可下落组集合，并将其补集称为静态可下落组集合。
+			
 			\begin{definition}[静态不可下落组]
 				设$S\in\mathbb{S}$。
 				定义
@@ -987,6 +1134,9 @@
 				$$
 				称为$S$中的\textbf{静态可下落组集合}。
 			\end{definition}
+			
+			接下来说明，上述静态定义并不仅仅是图论上的构造，它与队列式全局下落过程中的实际行为一致。
+			也就是说，一个初始最大粘连组是否会在全局下落过程中发生下落，可以由支撑闭包算子的最大不动点完全决定。
 			
 			\begin{proposition}[不可下落组的不动点刻画]\label{prop:nonfalling-fixed-point}
 				设$S\in\mathbb{S}$。
@@ -1017,6 +1167,10 @@
 				
 				综上，不会下落的组恰为$\nu\Theta_S$。
 			\end{proof}
+			
+			有了不可下落组的不动点刻画后，可以将队列式下落过程改写为一个更静态的过程：
+			先找出保持不动的最大粘连组，再删除会下落部分中的晶体，最后让其余可下落部分按自底向上的顺序稳定下来。
+			这一过程称为静态下落过程。
 			
 			\begin{definition}[静态下落过程]
 				设$S\in\mathbb{S}$。
@@ -1053,6 +1207,9 @@
 				\operatorname{Fall}_{\mathrm{st}}(S).
 				$$
 			\end{definition}
+			
+			静态下落过程的目的是摆脱队列顺序的细节，直接从支撑结构判断哪些部分保持不动，哪些部分需要下落。
+			下面说明，这一静态过程与前面定义的队列式全局下落过程得到相同结果。
 			
 			\begin{theorem}[队列下落与静态下落的等价性]
 				对任意图形$S\in\mathbb{S}$，都有
@@ -1095,8 +1252,19 @@
 				$$
 			\end{proof}
 			
+			因此，队列式下落与支撑不动点刻画给出了同一机制的两种描述。
+			前者适合模拟游戏执行过程，后者适合分析图形结构，尤其适合研究循环支撑结构对下落结果的影响。
+			后续若只关心哪些最大粘连组最终保持不动，可以直接使用支撑闭包算子的最大不动点。
+			
 		\subsection{晶体机制}
-		
+			
+			晶体在游戏中具有特殊行为。
+			一方面，晶体可以参与粘连与支撑；另一方面，当某个晶体被破碎时，并不是只删除该单个晶体，而是删除与其上下左右连通的整个晶体簇。
+			此外，某些操作会删除超过高度上限的部分，若被删除部分包含晶体，也会触发相应晶体簇的破碎。
+			因此本节先定义晶体簇，再定义晶体破碎和超上限删除。
+			
+			晶体簇只考虑晶体之间的上下左右邻接关系，与前文定义的粘连组不同。
+			
 			\begin{definition}[晶体簇]
 				设$S\in\mathbb{S}$。
 				
@@ -1132,7 +1300,10 @@
 				[p]^c_S=\{q\in C_S\mid q\equiv^c_S p\}.
 				$$
 			\end{definition}
-						
+			
+			晶体破碎以晶体簇为单位发生。
+			因此，当某个晶体位置被触发破碎时，需要将其所在的整个晶体簇全部置空。
+			
 			\begin{definition}[晶体破碎]
 				设$S\in\mathbb{S}$，$p\in C_S$。
 				称
@@ -1143,6 +1314,10 @@
 				$$
 				为$p$处晶体破碎后的图形。
 			\end{definition}
+			
+			除了显式的晶体破碎外，超上限删除也可能间接触发晶体破碎。
+			当图形的高度超过某个上限时，上方超出部分会被删除；
+			若这部分中含有晶体，则这些晶体所在的晶体簇也会一并破碎。
 			
 			\begin{definition}[超上限删除]
 				设$S\in\mathbb{S}$，记
@@ -1180,7 +1355,22 @@
 				为高度上限$\ell$下的\textbf{超上限删除操作}。
 			\end{definition}
 			
+			需要注意的是，超上限删除本身只描述删除与破碎操作。
+			若某个机器在超上限删除后还会触发下落，则该下落过程应在对应机器操作的定义中额外调用全局下落映射。
+			
 		\subsection{机器操作}
+			
+			在前面定义图形、粘连、下落与晶体机制后，可以形式化描述游戏中的机器操作。
+			本文将机器操作视为作用在图形上的部分映射。
+			不同机器可能具有不同的输入输出元数：例如旋转、半破、结晶和上色是一输入一输出，切割是一输入二输出，交换是二输入二输出，堆叠是二输入一输出。
+			本节逐一定义这些机器操作。
+			
+			旋转操作并不是矩阵几何意义上的平面旋转，而是沿图形的水平方向进行循环平移。
+			当宽度为$4$时，顺时针旋转一个象限对应每一行形如
+			$$
+			1,2,3,4\mapsto 2,3,4,1
+			$$
+			的循环平移。
 			
 			\begin{definition}[旋转]
 				设$S\in\mathbb{S}$为一个图形，记
@@ -1205,7 +1395,10 @@
 				$$
 				其中$\bmod w$的取值约定为$\{0,1,\dots,w-1\}$。
 			\end{definition}
-
+			
+			由循环平移的定义可以直接得到旋转操作的若干基本代数性质。
+			这些性质说明旋转操作按复合构成一个循环作用。
+			
 			\begin{proposition}[旋转的基本性质]
 				对任意$S\in\mathbb{S}$与任意$k,\ell\in\mathbb{Z}$，有
 				$$
@@ -1222,6 +1415,9 @@
 				$$
 				其中$w=\operatorname{wd}(S)$。
 			\end{proposition}
+			
+			切割、半破和交换都需要将图形沿中线分成左右两个半边。
+			为统一描述这些操作，先定义图形的西半边、东半边，以及由两个半边重新拼接得到图形的操作。
 			
 			\begin{definition}[东西半边与拼接]
 				设$S\in\mathbb{S}$，记
@@ -1276,6 +1472,10 @@
 				$$
 			\end{definition}
 			
+			切割操作不仅会将图形分成东西两半，还可能切碎位于切割线两侧的晶体。
+			具体地，如果同一行中切割线左右两侧相邻位置都是晶体，则这些晶体会被切割直接触发破碎。
+			因此先定义由切割直接触发的晶体集合及其导致破碎的全部晶体位置集合。
+			
 			\begin{definition}[切割触发晶体]
 				设$S\in\mathbb{S}$，记
 				$$
@@ -1304,6 +1504,9 @@
 				X_{\mathrm{cut}}(S)=\varnothing.
 				$$
 			\end{definition}
+			
+			完成切割触发破碎后，图形被分成西半边和东半边。
+			两个半边随后分别独立执行一次全局下落，得到切割操作的两个输出。
 			
 			\begin{definition}[切割]
 				设$S\in\mathbb{S}$。
@@ -1339,6 +1542,9 @@
 				$$
 			\end{definition}
 			
+			半破可以看作切割操作的变体。
+			它执行与切割相同的前置步骤，但只保留切割后的东半边作为输出。
+			
 			\begin{definition}[半破]
 				设$S\in\mathbb{S}$。
 				定义$S$经过\textbf{半破}后的结果为
@@ -1349,6 +1555,9 @@
 				$$
 				也就是说，半破先对$S$执行切割，然后只输出切割后的东半边。
 			\end{definition}
+			
+			交换操作作用于两个尺寸相同的输入图形。
+			它先分别对两个输入执行切割，然后交换它们的东半边，并与各自剩余的西半边重新拼接。
 			
 			\begin{definition}[交换]
 				设$S,T\in\mathbb{S}$具有相同的高度和宽度。
@@ -1373,6 +1582,9 @@
 				$$
 				也就是说，两个输入图形先分别执行切割，然后将所得半边交叉拼接，得到两个新的图形。
 			\end{definition}
+			
+			堆叠操作需要将两个图形按上下方向组合。
+			为此先定义上下拼接操作：将一个图形放在另一个图形上方，并在中间插入一层空层。
 			
 			\begin{definition}[上下拼接]
 				设$S,T\in\mathbb{S}$，且
@@ -1400,6 +1612,10 @@
 				\end{cases}
 				$$
 			\end{definition}
+			
+			堆叠机器的实际行为并不是简单地把两个图形拼接在一起。
+			两个输入图形上下拼接后，会先执行一次全局下落，再进行超上限删除，最后再次执行全局下落。
+			这里的高度上限$\ell$用于描述机器最终允许保留的最大高度。
 			
 			\begin{definition}[堆叠]
 				设$S,T\in\mathbb{S}$，且
@@ -1444,6 +1660,10 @@
 				$$
 			\end{definition}
 			
+			结晶操作是带颜色参数的一元机器操作。
+			它从图形最上方的非空层开始，向下将所有空块或顶针替换为指定颜色的晶体。
+			普通形状与已有晶体保持不变。
+			
 			\begin{definition}[结晶]
 				设$S\in\mathbb{S}$，$\kappa\in\mathbb{C}$为指定颜色。
 				若$U_S=\varnothing$，则定义
@@ -1485,6 +1705,9 @@
 				\end{cases}
 				$$
 			\end{definition}
+			
+			与结晶不同，上色操作不会改变图形的空间结构。
+			它只修改最顶层普通实体块的颜色，空块、顶针和晶体均不受影响。
 			
 			\begin{definition}[上色]
 				设$S\in\mathbb{S}$，$\kappa\in\mathbb{C}$为指定颜色。
@@ -1532,41 +1755,102 @@
 				$$
 			\end{definition}
 			
-		\subsection{颜色无关性}
+			至此，本文所需的基础机器操作均已形式化定义。
+			这些操作将在后续章节中统一视为机器操作族的一部分，用于定义可制作图形、制作路径以及空间可制作性。
 			
-			\begin{definition}[块的空间结构]
-				定义块的\textbf{空间结构}为其类型分量。
-				即对块
+	\section{空间结构与可制作性}
+		
+		第一章给出了游戏机制在有颜色图形上的定义。
+		然而在许多结构性问题中，颜色并不是决定图形形态变化的关键因素。
+		例如，粘连、支撑、下落、切割和堆叠等操作主要依赖块的类型以及块所在的位置，而不依赖具体颜色。
+		因此，本章引入图形的空间结构，研究在忘记颜色之后的制作系统。
+		这一抽象将用于后续讨论图形的可制作性。
+				
+		\subsection{空间结构与颜色无关性}
+		
+			所谓空间结构，是指只记录每个位置处块的类型，而忽略颜色信息。
+			为了将这一思想形式化，我们先定义空间图形作为有颜色图形的“忘色”版本，再定义从图形到空间图形的空间结构映射。
+			
+			\begin{definition}[空间图形]
+				称$\mathbb{T}_{\mathrm{blk}}$中的元素为\textbf{空间块}。
+				
+				一个\textbf{空间图形}是一个矩阵
 				$$
-				b=(\tau,\chi)\in\mathbb{B},
+				A=(\alpha_{ij})\in \mathbb{T}_{\mathrm{blk}}^{h\times w},
 				$$
-				定义
+				其中$h,w\in\mathbb{N}_{+}$，且$w$为偶数。
+				所有空间图形构成的集合记为
 				$$
-				\operatorname{sh}(b)=\tau.
+				\mathbb{S}_{\mathrm{sh}}
+				=
+				\bigcup_{\substack{h,w\in\mathbb{N}_{+}\\2\mid w}}
+				\mathbb{T}_{\mathrm{blk}}^{h\times w}.
+				$$
+				
+				对空间图形$A\in\mathbb{S}_{\mathrm{sh}}$，同样记
+				$$
+				\operatorname{ht}(A)=h,\qquad
+				\operatorname{wd}(A)=w,
+				$$
+				并定义其位置集合为
+				$$
+				I_A=\{1,\dots,h\}\times\{1,\dots,w\}.
+				$$
+				对$p=(i,j)\in I_A$，记
+				$$
+				A_p=\alpha_{ij}.
 				$$
 			\end{definition}
 			
-			\begin{definition}[图形的空间结构]
-				设$S\in\mathbb{S}$。
-				定义$S$的\textbf{空间结构}为
+			空间图形只记录类型矩阵，因此它不包含任何颜色信息。
+			接下来定义从原始图形到空间图形的映射，即把每个块替换为其类型分量。
+			
+			\begin{definition}[空间结构映射]
+				定义映射
+				$$
+				\operatorname{Sh}:\mathbb{S}\to\mathbb{S}_{\mathrm{sh}}
+				$$
+				如下。
+				对任意图形$S\in\mathbb{S}$，其空间结构
 				$$
 				\operatorname{Sh}(S)
-				=
-				(\tau_p)_{p\in I_S}.
 				$$
-				也就是说，$\operatorname{Sh}(S)$仅记录每个位置处块的类型，而忘记其颜色。
+				是与$S$具有相同高度和宽度的空间图形，并满足对任意$p\in I_S$，
+				$$
+				\bigl(\operatorname{Sh}(S)\bigr)_p=\tau_p.
+				$$
 				
 				若$S,T\in\mathbb{S}$满足
 				$$
-				I_S=I_T
-				\quad\text{且}\quad
 				\operatorname{Sh}(S)=\operatorname{Sh}(T),
 				$$
-				则称$S$与$T$具有相同的\textbf{空间结构}，记作
+				则称$S$与$T$具有相同空间结构，记作
 				$$
 				S\equiv_{\mathrm{sh}}T.
 				$$
 			\end{definition}
+			
+			空间结构映射将一个有颜色图形投影到其类型分布。
+			反过来，一个空间图形通常可以由许多不同颜色分配的图形实现。
+			因此需要定义空间图形的有颜色实现。
+			
+			\begin{definition}[有颜色实现]
+				设$A\in\mathbb{S}_{\mathrm{sh}}$，$S\in\mathbb{S}$。
+				若
+				$$
+				\operatorname{Sh}(S)=A,
+				$$
+				则称$S$是$A$的一个\textbf{有颜色实现}。
+				所有$A$的有颜色实现构成的集合记为
+				$$
+				\operatorname{Real}(A)
+				=
+				\{S\in\mathbb{S}\mid \operatorname{Sh}(S)=A\}.
+				$$
+			\end{definition}
+			
+			接下来证明，前文中许多基础结构实际上只依赖空间结构。
+			换言之，只要两个图形具有相同空间结构，那么它们的非空位置、晶体位置、粘连关系、支撑关系以及可下落判断都相同。
 			
 			\begin{proposition}[基础结构的颜色无关性]\label{prop:basic-shape-invariance}
 				设$S,T\in\mathbb{S}$，且
@@ -1587,6 +1871,8 @@
 				故上述对象均相同。
 			\end{proof}
 			
+			由于下落过程完全由最大粘连组、支撑关系和晶体类型决定，而这些对象均与颜色无关，因此全局下落结果的空间结构也只依赖输入图形的空间结构。
+			
 			\begin{proposition}[全局下落的颜色无关性]\label{prop:fall-shape-invariance}
 				若$S,T\in\mathbb{S}$满足
 				$$
@@ -1606,6 +1892,9 @@
 				因此，从$S$与$T$出发的下落过程在空间结构层面逐步一致。
 				故终止后得到的图形空间结构相同。
 			\end{proof}
+			
+			晶体破碎同样只取决于晶体所在的位置以及晶体之间的上下左右连通关系。
+			这些信息都包含在空间结构中，因此晶体破碎也与颜色无关。
 			
 			\begin{proposition}[晶体破碎的颜色无关性]\label{prop:break-shape-invariance}
 				设$S,T\in\mathbb{S}$，且
@@ -1637,6 +1926,9 @@
 				$$
 			\end{proof}
 			
+			置空操作是晶体破碎、超上限删除和切割等机制的基本组成部分。
+			它只将指定位置替换为空块，因此显然只影响类型分布而不依赖原有颜色。
+			
 			\begin{proposition}[置空操作的颜色无关性]\label{prop:emptying-shape-invariance}
 				设$S,T\in\mathbb{S}$，且
 				$$
@@ -1655,6 +1947,9 @@
 				对任意$p\notin A$，两边分别保持$S_p$与$T_p$，而$S\equiv_{\mathrm{sh}}T$保证二者类型相同。
 				故置空后空间结构仍相同。
 			\end{proof}
+			
+			超上限删除由两部分组成：删除超出高度上限的区域，以及由该区域中的晶体触发晶体簇破碎。
+			由于这两部分都只依赖空间结构，超上限删除也保持颜色无关性。
 			
 			\begin{proposition}[超上限删除的颜色无关性]\label{prop:clip-shape-invariance}
 				设$S,T\in\mathbb{S}$，且
@@ -1693,6 +1988,9 @@
 				最后，$\operatorname{Clip}_\ell$只保留最下方相同数量的层，故最终输出图形仍具有相同空间结构。
 			\end{proof}
 			
+			接下来逐一检查第一章中定义的机器操作。
+			旋转只是对位置进行循环重排，不改变任何块的类型，因此显然与颜色无关。
+			
 			\begin{proposition}[旋转的颜色无关性]\label{prop:rot-shape-invariance}
 				设$S,T\in\mathbb{S}$，且
 				$$
@@ -1710,6 +2008,9 @@
 				旋转操作只按固定规则重排位置上的块，不改变块的类型。
 				由于$S$与$T$在对应位置上类型相同，重排后对应位置上的类型仍相同。
 			\end{proof}
+			
+			切割和交换中会用到半边保留与拼接操作。
+			因此在证明切割、半破和交换的颜色无关性之前，先证明这些辅助操作只依赖空间结构。
 			
 			\begin{proposition}[保留操作的颜色无关性]\label{prop:restriction-shape-invariance}
 				设$S,T\in\mathbb{S}$，且
@@ -1732,6 +2033,9 @@
 				由\cref{prop:emptying-shape-invariance}即得结论。
 			\end{proof}
 			
+			保留操作处理单个图形的局部区域，而东西拼接则从两个图形中分别取西半边和东半边。
+			若对应输入的空间结构相同，则拼接后的空间结构也相同。
+			
 			\begin{proposition}[东西拼接的颜色无关性]\label{prop:horizontal-glue-shape-invariance}
 				设$S_1,T_1,S_2,T_2\in\mathbb{S}$，且它们具有相同的高度和宽度。
 				若
@@ -1752,6 +2056,9 @@
 				东西拼接在西半边取第一个输入，在东半边取第二个输入。
 				由于对应输入在对应位置上的类型相同，拼接后对应位置上的类型也相同。
 			\end{proof}
+			
+			切割操作包括切割触发晶体破碎、半边保留以及对两个半边分别执行全局下落。
+			前面已经证明这些组成部分均与颜色无关，因此切割本身也与颜色无关。
 			
 			\begin{proposition}[切割的颜色无关性]\label{prop:cut-shape-invariance}
 				设$S,T\in\mathbb{S}$，且
@@ -1790,6 +2097,9 @@
 				故切割输出的两个半边分别空间结构相同。
 			\end{proof}
 			
+			半破只是切割操作后取东半边输出。
+			因此它的颜色无关性直接由切割的颜色无关性得到。
+			
 			\begin{proposition}[半破的颜色无关性]\label{prop:half-shape-invariance}
 				设$S,T\in\mathbb{S}$，且
 				$$
@@ -1808,6 +2118,9 @@
 				由\cref{prop:cut-shape-invariance}即得结论。
 			\end{proof}
 			
+			交换操作由两次切割和一次东西拼接组成。
+			既然切割和东西拼接均保持空间结构相容，交换操作也与颜色无关。
+			
 			\begin{proposition}[交换的颜色无关性]\label{prop:swap-shape-invariance}
 				设$S_1,T_1,S_2,T_2\in\mathbb{S}$，且对应图形具有相同的高度和宽度。
 				若
@@ -1824,6 +2137,9 @@
 				交换操作只是将这些半边交叉拼接。
 				再由\cref{prop:horizontal-glue-shape-invariance}，两个输出图形分别具有相同空间结构。
 			\end{proof}
+			
+			为了处理堆叠操作，还需要考虑上下拼接。
+			上下拼接只改变图形在垂直方向上的排列，并插入一层空层，因此也只依赖空间结构。
 			
 			\begin{proposition}[上下拼接的颜色无关性]\label{prop:vertical-glue-shape-invariance}
 				设$S_1,T_1,S_2,T_2\in\mathbb{S}$，且
@@ -1850,6 +2166,9 @@
 				上下拼接只是将第一个输入放在上方，第二个输入放在下方，并在中间加入一空层。
 				对应输入空间结构相同，而中间空层也相同，因此拼接后空间结构相同。
 			\end{proof}
+			
+			堆叠操作由上下拼接、全局下落、超上限删除以及再次全局下落组成。
+			这些组成部分均已证明与颜色无关，因此堆叠操作的输出空间结构也只由输入空间结构决定。
 			
 			\begin{proposition}[堆叠的颜色无关性]\label{prop:stack-shape-invariance}
 				设$S_1,T_1,S_2,T_2\in\mathbb{S}$，且对应图形宽度相同。
@@ -1880,6 +2199,10 @@
 				故堆叠结果具有相同空间结构。
 			\end{proof}
 			
+			结晶和上色是仅有的显式带颜色参数的机器操作。
+			虽然它们需要指定颜色，但它们对空间结构的影响并不依赖具体选取的颜色。
+			下面分别说明这一点。
+			
 			\begin{proposition}[结晶的空间结构相容性]\label{prop:cry-shape-compatibility}
 				设$S,T\in\mathbb{S}$，且
 				$$
@@ -1905,6 +2228,8 @@
 				对$p\notin R_S$，两侧保持原类型，而原类型相同。
 				故结论成立。
 			\end{proof}
+			
+			特别地，当两个输入图形相同时，可以得到结晶操作对颜色参数本身的无关性。
 			
 			\begin{proposition}[结晶颜色无关性]\label{prop:cry-color-independence}
 				设$S\in\mathbb{S}$，$\kappa,\lambda\in\mathbb{C}$。
@@ -1934,6 +2259,9 @@
 				$$
 			\end{proof}
 			
+			上色操作更为直接：它只改变普通实体块的颜色分量，不改变任何位置处的块类型。
+			因此上色在空间结构层面等同于恒等操作。
+			
 			\begin{proposition}[上色的空间结构相容性]\label{prop:paint-shape-compatibility}
 				设$S,T\in\mathbb{S}$，且
 				$$
@@ -1961,6 +2289,8 @@
 				$$
 				又$S\equiv_{\mathrm{sh}}T$，故结论成立。
 			\end{proof}
+			
+			同样地，将两个输入图形取为同一个图形，便得到上色操作对颜色参数的无关性。
 			
 			\begin{proposition}[上色颜色无关性]\label{prop:paint-color-independence}
 				设$S\in\mathbb{S}$，$\kappa,\lambda\in\mathbb{C}$。
@@ -1991,6 +2321,9 @@
 				$$
 			\end{proof}
 			
+			综上，所有已定义的基础操作和机器操作都与颜色无关。
+			也就是说，在只关心空间结构时，可以忽略结晶和上色中具体选择的颜色，只保留它们对块类型分布的影响。
+			
 			\begin{theorem}[机器操作的颜色无关性]\label{thm:machine-shape-invariance}
 				所有已定义的机器操作在空间结构意义下均与颜色无关。
 				也就是说，若各输入图形分别具有相同的空间结构，则无论结晶、上色操作选取何种颜色参数，对应输出图形仍具有相同的空间结构。
@@ -2006,8 +2339,12 @@
 				故所有已定义机器操作均满足颜色无关性。
 			\end{proof}
 			
-		\subsection{可制作图形与制作路径}
+			该定理说明，所有机器操作都可以下降到空间结构层面。
+			换言之，只要两个输入图形具有相同空间结构，那么无论它们的颜色如何分配，对应机器操作的输出空间结构都相同。
+			这为后续定义空间机器操作和空间可制作性奠定了基础。
 			
+		\subsection{可制作图形与制作路径}
+						
 			\begin{definition}[机器操作族]
 				一个\textbf{机器操作}是一个有限输入、有限输出的部分映射
 				$$
@@ -2232,5 +2569,536 @@
 				S\equiv_{\mathrm{sh}}S'.
 				$$
 			\end{proof}
+			
+		\subsection{空间可制作性}
+			
+			\begin{definition}[空间机器操作]
+				设
+				$$
+				M:\operatorname{Dom}(M)\subseteq \mathbb{S}^{a(M)}
+				\to
+				\mathbb{S}^{b(M)}
+				$$
+				为一个机器操作。
+				若存在映射
+				$$
+				M^{\mathrm{sh}}:
+				\operatorname{Dom}(M^{\mathrm{sh}})
+				\subseteq
+				\mathbb{S}_{\mathrm{sh}}^{a(M)}
+				\to
+				\mathbb{S}_{\mathrm{sh}}^{b(M)}
+				$$
+				使得对任意
+				$$
+				(S_1,\dots,S_{a(M)})\in\operatorname{Dom}(M),
+				$$
+				若
+				$$
+				M(S_1,\dots,S_{a(M)})
+				=
+				(T_1,\dots,T_{b(M)}),
+				$$
+				则
+				$$
+				M^{\mathrm{sh}}
+				\bigl(
+				\operatorname{Sh}(S_1),\dots,\operatorname{Sh}(S_{a(M)})
+				\bigr)
+				=
+				\bigl(
+				\operatorname{Sh}(T_1),\dots,\operatorname{Sh}(T_{b(M)})
+				\bigr),
+				$$
+				则称$M^{\mathrm{sh}}$为$M$诱导的\textbf{空间机器操作}。
+				
+				若$M^{\mathrm{sh}}$由$M$诱导，则约定
+				$$
+				a(M^{\mathrm{sh}})=a(M),
+				\qquad
+				b(M^{\mathrm{sh}})=b(M).
+				$$
+			\end{definition}
+			
+			\begin{proposition}[空间机器操作的良定义性]\label{prop:shape-machine-well-defined}
+				每个已定义的机器操作$M\in\mathfrak{M}$都诱导唯一的空间机器操作$M^{\mathrm{sh}}$。
+			\end{proposition}
+			
+			\begin{proof}
+				由\cref{thm:machine-shape-invariance}，若两组输入图形具有相同空间结构，则对应输出图形也具有相同空间结构。
+				因此输出空间结构只依赖输入空间结构，而与所选有颜色实现无关。
+				故$M^{\mathrm{sh}}$良定义且唯一。
+			\end{proof}
+			
+			\begin{definition}[空间机器操作族]
+				定义
+				$$
+				\mathfrak{M}_{\mathrm{sh}}
+				=
+				\{M^{\mathrm{sh}}\mid M\in\mathfrak{M}\}
+				$$
+				为由$\mathfrak{M}$诱导的\textbf{空间机器操作族}。
+			\end{definition}
+			
+			\begin{proposition}[结晶与上色的空间机器操作]
+				对任意$\kappa,\lambda\in\mathbb{C}$，
+				$$
+				(\operatorname{Cry}_{\kappa})^{\mathrm{sh}}
+				=
+				(\operatorname{Cry}_{\lambda})^{\mathrm{sh}}.
+				$$
+				因此可记为$\operatorname{Cry}^{\mathrm{sh}}$。
+				此外，
+				$$
+				(\operatorname{Paint}_{\kappa})^{\mathrm{sh}}
+				=
+				\operatorname{id}_{\mathbb{S}_{\mathrm{sh}}}.
+				$$
+			\end{proposition}
+			
+			\begin{definition}[空间可制作图形]
+				设$\mathcal{A}\subseteq\mathbb{S}_{\mathrm{sh}}$为初始空间图形集合。
+				定义由$\mathcal{A}$生成的\textbf{空间可制作图形集合}
+				$$
+				\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})
+				$$
+				为满足以下条件的最小子集$\mathcal{M}\subseteq\mathbb{S}_{\mathrm{sh}}$：
+				\begin{enumerate}
+					\item
+					$$
+					\mathcal{A}\subseteq\mathcal{M};
+					$$
+					
+					\item 对任意$M^{\mathrm{sh}}\in\mathfrak{M}_{\mathrm{sh}}$，若
+					$$
+					(A_1,\dots,A_{a(M)})
+					\in
+					\operatorname{Dom}(M^{\mathrm{sh}})\cap\mathcal{M}^{a(M)}
+					$$
+					且
+					$$
+					M^{\mathrm{sh}}(A_1,\dots,A_{a(M)})
+					=
+					(B_1,\dots,B_{b(M)}),
+					$$
+					则
+					$$
+					B_1,\dots,B_{b(M)}\in\mathcal{M}.
+					$$
+				\end{enumerate}
+				
+				若$A\in\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})$，则称$A$从$\mathcal{A}$出发\textbf{空间可制作}。
+			\end{definition}
+			
+			\begin{definition}[空间制作路径]
+				设$\mathcal{A}\subseteq\mathbb{S}_{\mathrm{sh}}$为初始空间图形集合。
+				一条从$\mathcal{A}$出发的\textbf{空间制作路径}是一个有限序列
+				$$
+				\Pi_{\mathrm{sh}}
+				=
+				(\mathcal{A}_0,\mathcal{A}_1,\dots,\mathcal{A}_n),
+				$$
+				其中每个$\mathcal{A}_r\subseteq\mathbb{S}_{\mathrm{sh}}$为有限集合，并满足：
+				\begin{enumerate}
+					\item
+					$$
+					\mathcal{A}_0\subseteq\mathcal{A}.
+					$$
+					
+					\item 对每个$r=0,\dots,n-1$，存在空间机器操作
+					$$
+					M_r^{\mathrm{sh}}\in\mathfrak{M}_{\mathrm{sh}},
+					$$
+					以及输入元组
+					$$
+					\mathbf{A}_r
+					=
+					(A_{r,1},\dots,A_{r,a(M_r^{\mathrm{sh}})})
+					\in
+					\mathcal{A}_r^{a(M_r^{\mathrm{sh}})}
+					$$
+					使得
+					$$
+					\mathbf{A}_r\in\operatorname{Dom}(M_r^{\mathrm{sh}}).
+					$$
+					若
+					$$
+					M_r^{\mathrm{sh}}(\mathbf{A}_r)
+					=
+					(B_{r,1},\dots,B_{r,b(M_r^{\mathrm{sh}})}),
+					$$
+					则
+					$$
+					\mathcal{A}_{r+1}
+					=
+					\mathcal{A}_r
+					\cup
+					\{B_{r,1},\dots,B_{r,b(M_r^{\mathrm{sh}})}\}.
+					$$
+				\end{enumerate}
+				
+				若$A\in\mathcal{A}_n$，则称空间制作路径$\Pi_{\mathrm{sh}}$\textbf{制作出}$A$。
+			\end{definition}
+			
+			\begin{proposition}[空间制作路径刻画空间可制作性]\label{prop:shape-make-path-characterization}
+				设$\mathcal{A}\subseteq\mathbb{S}_{\mathrm{sh}}$，$A\in\mathbb{S}_{\mathrm{sh}}$。
+				则
+				$$
+				A\in\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})
+				$$
+				当且仅当存在一条从$\mathcal{A}$出发并制作出$A$的空间制作路径。
+			\end{proposition}
+			
+			\begin{proof}
+				由$\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})$作为包含$\mathcal{A}$且对$\mathfrak{M}_{\mathrm{sh}}$中所有空间机器操作封闭的最小集合的定义可知。
+				
+				具体地，任意空间制作路径中的每一步都只是在当前集合中加入某个空间机器操作的输出，
+				因此空间制作路径所得到的空间图形均属于$\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})$。
+				
+				反过来，$\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})$中的每个空间图形都可由有限次应用上述闭包规则得到，
+				这些有限次应用按顺序排列即给出一条空间制作路径。
+			\end{proof}
+			
+			\begin{proposition}[可制作性的空间投影]\label{prop:make-shape-projection}
+				设$\mathcal{I}\subseteq\mathbb{S}$，并记
+				$$
+				\operatorname{Sh}(\mathcal{I})
+				=
+				\{\operatorname{Sh}(S)\mid S\in\mathcal{I}\}.
+				$$
+				若
+				$$
+				S\in\operatorname{Make}(\mathcal{I}),
+				$$
+				则
+				$$
+				\operatorname{Sh}(S)
+				\in
+				\operatorname{Make}_{\mathrm{sh}}(\operatorname{Sh}(\mathcal{I})).
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				由\cref{prop:make-path-characterization}，存在一条从$\mathcal{I}$出发并制作出$S$的制作路径
+				$$
+				\Pi=(\mathcal{S}_0,\mathcal{S}_1,\dots,\mathcal{S}_n).
+				$$
+				
+				对每个$r=0,\dots,n$，定义
+				$$
+				\mathcal{A}_r
+				=
+				\operatorname{Sh}(\mathcal{S}_r)
+				=
+				\{\operatorname{Sh}(T)\mid T\in\mathcal{S}_r\}.
+				$$
+				由于$\mathcal{S}_0\subseteq\mathcal{I}$，有
+				$$
+				\mathcal{A}_0\subseteq\operatorname{Sh}(\mathcal{I}).
+				$$
+				
+				对每个$r=0,\dots,n-1$，由制作路径定义，存在机器操作
+				$$
+				M_r\in\mathfrak{M}
+				$$
+				以及输入元组
+				$$
+				\mathbf{S}_r
+				=
+				(S_{r,1},\dots,S_{r,a(M_r)})
+				\in \mathcal{S}_r^{a(M_r)}
+				$$
+				使得
+				$$
+				\mathbf{S}_r\in\operatorname{Dom}(M_r).
+				$$
+				若
+				$$
+				M_r(\mathbf{S}_r)
+				=
+				(T_{r,1},\dots,T_{r,b(M_r)}),
+				$$
+				则
+				$$
+				\mathcal{S}_{r+1}
+				=
+				\mathcal{S}_r
+				\cup
+				\{T_{r,1},\dots,T_{r,b(M_r)}\}.
+				$$
+				
+				由空间机器操作的定义，
+				$$
+				M_r^{\mathrm{sh}}
+				\bigl(
+				\operatorname{Sh}(S_{r,1}),\dots,\operatorname{Sh}(S_{r,a(M_r)})
+				\bigr)
+				=
+				\bigl(
+				\operatorname{Sh}(T_{r,1}),\dots,\operatorname{Sh}(T_{r,b(M_r)})
+				\bigr).
+				$$
+				因此
+				$$
+				\mathcal{A}_{r+1}
+				=
+				\mathcal{A}_r
+				\cup
+				\{
+				\operatorname{Sh}(T_{r,1}),\dots,\operatorname{Sh}(T_{r,b(M_r)})
+				\}
+				$$
+				由$\mathcal{A}_r$经过一次空间机器操作得到。
+				
+				于是
+				$$
+				\Pi_{\mathrm{sh}}
+				=
+				(\mathcal{A}_0,\mathcal{A}_1,\dots,\mathcal{A}_n)
+				$$
+				是一条从$\operatorname{Sh}(\mathcal{I})$出发的空间制作路径。
+				由于$S\in\mathcal{S}_n$，有
+				$$
+				\operatorname{Sh}(S)\in\mathcal{A}_n.
+				$$
+				由\cref{prop:shape-make-path-characterization}，
+				$$
+				\operatorname{Sh}(S)
+				\in
+				\operatorname{Make}_{\mathrm{sh}}(\operatorname{Sh}(\mathcal{I})).
+				$$
+			\end{proof}
+			
+			\begin{proposition}[空间制作的有颜色实现]\label{prop:shape-make-realization}
+				设$\mathcal{A}\subseteq\mathbb{S}_{\mathrm{sh}}$。
+				对每个$A\in\mathcal{A}$，任取一个有颜色实现$S_A\in\operatorname{Real}(A)$，
+				并令
+				$$
+				\mathcal{I}
+				=
+				\{S_A\mid A\in\mathcal{A}\}.
+				$$
+				若
+				$$
+				B\in\operatorname{Make}_{\mathrm{sh}}(\mathcal{A}),
+				$$
+				则存在
+				$$
+				T\in\operatorname{Make}(\mathcal{I})
+				$$
+				使得
+				$$
+				\operatorname{Sh}(T)=B.
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				由\cref{prop:shape-make-path-characterization}，存在一条从$\mathcal{A}$出发并制作出$B$的空间制作路径
+				$$
+				\Pi_{\mathrm{sh}}
+				=
+				(\mathcal{A}_0,\mathcal{A}_1,\dots,\mathcal{A}_n).
+				$$
+				
+				我们对$r=0,\dots,n$构造有限集合
+				$$
+				\mathcal{S}_r\subseteq\operatorname{Make}(\mathcal{I})
+				$$
+				使得
+				$$
+				\operatorname{Sh}(\mathcal{S}_r)=\mathcal{A}_r.
+				$$
+				
+				当$r=0$时，由$\mathcal{A}_0\subseteq\mathcal{A}$，且每个$A\in\mathcal{A}$都有选定实现$S_A\in\mathcal{I}$，令
+				$$
+				\mathcal{S}_0
+				=
+				\{S_A\mid A\in\mathcal{A}_0\}.
+				$$
+				则
+				$$
+				\mathcal{S}_0\subseteq\mathcal{I}\subseteq\operatorname{Make}(\mathcal{I}),
+				\qquad
+				\operatorname{Sh}(\mathcal{S}_0)=\mathcal{A}_0.
+				$$
+				
+				假设已经构造了$\mathcal{S}_r$，且
+				$$
+				\operatorname{Sh}(\mathcal{S}_r)=\mathcal{A}_r.
+				$$
+				由空间制作路径定义，存在
+				$$
+				M_r^{\mathrm{sh}}\in\mathfrak{M}_{\mathrm{sh}}
+				$$
+				和输入元组
+				$$
+				(A_{r,1},\dots,A_{r,a(M_r^{\mathrm{sh}})})
+				\in
+				\mathcal{A}_r^{a(M_r^{\mathrm{sh}})}
+				$$
+				使得该输入元组属于$\operatorname{Dom}(M_r^{\mathrm{sh}})$。
+				设
+				$$
+				M_r^{\mathrm{sh}}(A_{r,1},\dots,A_{r,a(M_r^{\mathrm{sh}})})
+				=
+				(B_{r,1},\dots,B_{r,b(M_r^{\mathrm{sh}})}).
+				$$
+				
+				由于$\operatorname{Sh}(\mathcal{S}_r)=\mathcal{A}_r$，对每个$i$，可取
+				$$
+				S_{r,i}\in\mathcal{S}_r
+				$$
+				使得
+				$$
+				\operatorname{Sh}(S_{r,i})=A_{r,i}.
+				$$
+				设$M_r\in\mathfrak{M}$为诱导$M_r^{\mathrm{sh}}$的有颜色机器操作。
+				
+				由于本文所有机器操作的定义域条件只依赖空间结构，且
+				$$
+				(A_{r,1},\dots,A_{r,a(M_r^{\mathrm{sh}})})
+				\in
+				\operatorname{Dom}(M_r^{\mathrm{sh}}),
+				$$
+				故
+				$$
+				(S_{r,1},\dots,S_{r,a(M_r)})
+				\in
+				\operatorname{Dom}(M_r).
+				$$
+				令
+				$$
+				M_r(S_{r,1},\dots,S_{r,a(M_r)})
+				=
+				(T_{r,1},\dots,T_{r,b(M_r)}).
+				$$
+				由$\mathcal{S}_r\subseteq\operatorname{Make}(\mathcal{I})$以及$\operatorname{Make}(\mathcal{I})$对机器操作封闭，
+				有
+				$$
+				T_{r,1},\dots,T_{r,b(M_r)}
+				\in
+				\operatorname{Make}(\mathcal{I}).
+				$$
+				并且由空间机器操作定义，
+				$$
+				\operatorname{Sh}(T_{r,j})=B_{r,j},
+				\qquad j=1,\dots,b(M_r).
+				$$
+				
+				令
+				$$
+				\mathcal{S}_{r+1}
+				=
+				\mathcal{S}_r
+				\cup
+				\{T_{r,1},\dots,T_{r,b(M_r)}\}.
+				$$
+				则
+				$$
+				\mathcal{S}_{r+1}\subseteq\operatorname{Make}(\mathcal{I}),
+				\qquad
+				\operatorname{Sh}(\mathcal{S}_{r+1})=\mathcal{A}_{r+1}.
+				$$
+				
+				由归纳法，存在$\mathcal{S}_n\subseteq\operatorname{Make}(\mathcal{I})$满足
+				$$
+				\operatorname{Sh}(\mathcal{S}_n)=\mathcal{A}_n.
+				$$
+				由于$B\in\mathcal{A}_n$，故存在
+				$$
+				T\in\mathcal{S}_n
+				$$
+				使得
+				$$
+				\operatorname{Sh}(T)=B.
+				$$
+				又$\mathcal{S}_n\subseteq\operatorname{Make}(\mathcal{I})$，因此
+				$$
+				T\in\operatorname{Make}(\mathcal{I}).
+				$$
+				结论成立。
+			\end{proof}
+			
+			\begin{definition}[空间相容定义域]
+				称机器操作$M\in\mathfrak{M}$具有\textbf{空间相容定义域}，如果对任意两组输入
+				$$
+				(S_1,\dots,S_{a(M)}),
+				\qquad
+				(T_1,\dots,T_{a(M)})
+				$$
+				满足
+				$$
+				S_i\equiv_{\mathrm{sh}}T_i,
+				\qquad i=1,\dots,a(M),
+				$$
+				都有
+				$$
+				(S_1,\dots,S_{a(M)})\in\operatorname{Dom}(M)
+				\quad\Longleftrightarrow\quad
+				(T_1,\dots,T_{a(M)})\in\operatorname{Dom}(M).
+				$$
+			\end{definition}
+			
+			\begin{proposition}[机器操作定义域的空间相容性]\label{prop:machine-domain-shape-compatible}
+				所有已定义机器操作均具有空间相容定义域。
+			\end{proposition}
+			
+			\begin{proof}
+				旋转、切割、半破、结晶和上色对任意图形均有定义。
+				交换的定义域条件为两个输入图形具有相同高度和宽度；
+				堆叠的定义域条件为两个输入图形具有相同宽度。
+				这些条件均只依赖输入图形的空间结构。
+				因此所有已定义机器操作均具有空间相容定义域。
+			\end{proof}
+			
+			\begin{corollary}[可制作图形的空间闭包]\label{cor:make-shape-closure}
+				设$\mathcal{I}\subseteq\mathbb{S}$。
+				则
+				$$
+				\operatorname{Sh}(\operatorname{Make}(\mathcal{I}))
+				\subseteq
+				\operatorname{Make}_{\mathrm{sh}}(\operatorname{Sh}(\mathcal{I})).
+				$$
+			\end{corollary}
+			
+			\begin{proof}
+				由\cref{prop:make-shape-projection}直接得到。
+			\end{proof}
+			
+			\begin{corollary}[空间可制作图形的实现]\label{cor:shape-make-realizable}
+				设$\mathcal{A}\subseteq\mathbb{S}_{\mathrm{sh}}$，并为每个$A\in\mathcal{A}$选定一个有颜色实现$S_A$。
+				令$\mathcal{I}=\{S_A\mid A\in\mathcal{A}\}$。
+				则
+				$$
+				\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})
+				\subseteq
+				\operatorname{Sh}(\operatorname{Make}(\mathcal{I})).
+				$$
+			\end{corollary}
+			
+			\begin{proof}
+				由\cref{prop:shape-make-realization}直接得到。
+			\end{proof}
+			
+			\begin{corollary}[空间制作与有颜色制作的对应]\label{cor:shape-colored-make-correspondence}
+				设$\mathcal{A}\subseteq\mathbb{S}_{\mathrm{sh}}$，并为每个$A\in\mathcal{A}$选定一个有颜色实现$S_A$。
+				令$\mathcal{I}=\{S_A\mid A\in\mathcal{A}\}$。
+				则
+				$$
+				\operatorname{Sh}(\operatorname{Make}(\mathcal{I}))
+				=
+				\operatorname{Make}_{\mathrm{sh}}(\mathcal{A}).
+				$$
+			\end{corollary}
+			
+			\begin{proof}
+				由\cref{prop:make-shape-projection,prop:shape-make-realization}可得两个方向的包含关系。
+			\end{proof}
+			
+	\section{紧图形的空间可制作性}
+		\subsection{紧图形与象限分解}
+		\subsection{单象限构造}
+		\subsection{多象限拼合}
+		\subsection{主定理}
 			
 \end{document}
