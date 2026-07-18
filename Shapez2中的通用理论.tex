@@ -88,7 +88,7 @@
 				=
 				\{-,P,c\}\cup \mathbb{T}
 				$$
-				为所有块类型构成的集合，其中$\mathbb{T}$为所有可能存在的实体类型的集合
+				为所有块类型构成的集合，其中$\mathbb{T}$为所有可能存在的普通实体类型的集合
 				（例如$C,R,S,W,X,Y$等），而$-$表示空类型，$P$与$c$分别表示顶针和晶体。
 				
 				记
@@ -97,27 +97,52 @@
 				=
 				\{-\}\cup \mathbb{C}
 				$$
-				为所有块颜色构成的集合，其中$\mathbb{C}$为所有可能存在的颜色的集合
+				为所有颜色记号构成的集合，其中$\mathbb{C}$为所有可能存在的实际颜色的集合
 				（例如$r,g,b,y,m,c,w,k,u$等），而$-$表示无颜色。
 				
-				一个\textbf{块}是一个二元组
-				$$
-				b=(\tau,\chi)\in \mathbb{T}_{\mathrm{blk}}\times \mathbb{C}_{\mathrm{blk}},
-				$$
-				其中$\tau$称为块的类型，$\chi$称为块的颜色。
-				
-				所有块构成的集合记为
+				游戏中允许出现的块并不是任意的类型--颜色二元组。
+				本文约定所有\textbf{合法块}构成的集合为
 				$$
 				\mathbb{B}
 				=
-				\mathbb{T}_{\mathrm{blk}}\times \mathbb{C}_{\mathrm{blk}}.
+				\{(-,-)\}
+				\cup
+				(\mathbb{T}\times\mathbb{C})
+				\cup
+				(\{c\}\times\mathbb{C})
+				\cup
+				\{(P,-)\}.
 				$$
+				也就是说：
+				\begin{itemize}
+					\item 空块只有一种，记为
+					$$
+					\mathbf{0}:=(-,-);
+					$$
+					\item 普通实体块具有普通实体类型与实际颜色，即形如
+					$$
+					(\tau,\chi),
+					\qquad
+					\tau\in\mathbb{T},\quad \chi\in\mathbb{C};
+					$$
+					\item 晶体块具有晶体类型与实际颜色，即形如
+					$$
+					(c,\chi),
+					\qquad
+					\chi\in\mathbb{C};
+					$$
+					\item 顶针没有颜色，只有一种形式
+					$$
+					(P,-).
+					$$
+				\end{itemize}
 				
-				称
+				对任意块
 				$$
-				\mathbf{0}:=(-,-)\in\mathbb{B}
+				b=(\tau,\chi)\in\mathbb{B},
 				$$
-				为\textbf{空块}。
+				称$\tau$为块的类型，称$\chi$为块的颜色记号。
+				当$\chi\in\mathbb{C}$时，称该块具有实际颜色；当$\chi=-$时，称该块无颜色。
 			\end{definition}
 			
 			有了单个块的定义后，一个图形便可以看作由块填充的有限矩阵。
@@ -167,7 +192,7 @@
 				设$S\in\mathbb{S}$。
 				定义$S$中的非空位置集合为
 				$$
-				U_S=\{p\in I_S\mid S_p\neq \mathbf{0}\}.
+				U_S=\{p\in I_S\mid \tau_p\neq -\}.
 				$$
 				定义$S$中的晶体位置集合为
 				$$
@@ -359,6 +384,8 @@
 				$$
 				G\leadsto_S H.
 				$$
+				
+				本文约定支撑路径长度可以为$0$，即$G\leadsto_S G$恒成立。
 			\end{definition}
 			
 			在通常情况下，支撑关系可以理解为从下方向上方传播的依赖关系。
@@ -423,15 +450,66 @@
 		\subsection{下落过程}
 		
 			下落是游戏中最重要的动态机制之一。
-			由于粘连关系的存在，图形并不是以单个块为单位下落，而是以最大粘连组为单位下落。
-			一个最大粘连组能否下落，取决于它是否触底以及下方是否存在其他非空块阻挡。
-			本节首先定义单个最大粘连组的一次下落，随后用队列状态转移刻画完整的全局下落过程。
+			由于粘连关系的存在，图形在下落开始时并不是以单个块为单位下落，而是以最大粘连组为初始下落单位。
+			在下落过程中，晶体删除可能使一个下落组分裂为若干后继组；同时，根据游戏底层规则，下落产生的后继组不会与外部下落组重新粘连。
+			因此，全局下落过程实际维护的是由初始最大粘连组及其后继组演化得到的下落组划分。
+			一个下落组能否下落，取决于它是否触底以及下方是否存在其他非空块阻挡。
+			本节首先定义单个下落组的一次下落，随后用队列状态转移刻画完整的全局下落过程。
 			
 			约定下落方向为行号增加的方向。
 			因此若位置$p=(i,j)$处的块下落一层，则其目标位置为$(i+1,j)$。
 			
+			\begin{definition}[下落组与下落组划分]
+				设$S\in\mathbb{S}$。
+				一个非空集合
+				$$
+				G\subseteq U_S
+				$$
+				称为$S$中的一个\textbf{下落组}，如果在当前下落过程中，$G$被作为一个整体进行可下落性判断与下落操作。
+				
+				一个有限集合
+				$$
+				\mathcal{P}=\{G_1,\dots,G_n\}
+				$$
+				称为$S$中的一个\textbf{下落组划分}，如果$G_1,\dots,G_n$两两不交，并且
+				$$
+				U_S=G_1\cup\cdots\cup G_n.
+				$$
+				
+				初始下落组划分取为最大粘连组划分
+				$$
+				\mathcal{P}_0(S)=\mathcal{G}(S).
+				$$
+			\end{definition}
+			
+			\begin{definition}[下落过程的不重粘连原则]
+				在全局下落过程中，若某个下落组$G$执行一次下落，则其下落后产生的后继组只由$G$自身的非晶体剩余部分决定。
+				
+				即使这些后继组在新的图形中与外部下落组在几何位置上相邻，并且按照静态粘连规则可以发生粘连，它们也不会在本次全局下落过程中与外部下落组重新合并。
+				
+				因此，全局下落过程维护的是由初始最大粘连组及其后继组演化得到的下落组划分，而不是在每次图形变化后重新计算整个图形的最大粘连组划分。
+			\end{definition}
+			
+			\begin{definition}[下落组之间的支撑关系]
+				设$S\in\mathbb{S}$，$\mathcal{P}$为当前图形$S$中的一个下落组划分。
+				对任意$G,H\in\mathcal{P}$，称$G$\textbf{动态支撑}$H$，记作
+				$$
+				G\preceq_{S,\mathcal{P}}H,
+				$$
+				当且仅当存在
+				$$
+				p=(i+1,j)\in G,\qquad q=(i,j)\in H,
+				$$
+				也就是说，$G$中某个块位于$H$中某个块的正下方相邻位置。
+				
+				若$G\neq H$且$G\preceq_{S,\mathcal{P}}H$，则称$G$\textbf{直接动态支撑}$H$，记作
+				$$
+				G\to_{S,\mathcal{P}}H.
+				$$
+			\end{definition}
+			
 			\begin{definition}[可下落]
-				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$为$S$中的一个最大粘连组。
+				设$S\in\mathbb{S}$，$G\subseteq U_S$为当前下落过程中的一个下落组。
 				记
 				$$
 				h=\operatorname{ht}(S),\qquad w=\operatorname{wd}(S).
@@ -453,12 +531,12 @@
 				等价地，$G$可以下落一层，当且仅当$G$中的每个块向下平移一格后，均不会越界，也不会与$G$之外的任何非空块发生冲突。
 			\end{definition}
 			
-			可下落性只判断一个最大粘连组是否能够整体向下平移一层。
+			可下落性只判断一个当前下落组是否能够整体向下平移一层。
 			若该判断为真，则可以定义实际的一次下落操作。
-			根据游戏规则，最大粘连组下落时，其中的晶体会被删除，而非晶体块则向下移动一层。
+			根据游戏规则，下落组执行下落时，其中的晶体会被删除，而非晶体块则向下移动一层。
 			
 			\begin{definition}[一次下落]
-				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$，且$G$在$S$中可以下落一层。
+				设$S\in\mathbb{S}$，$G\subseteq U_S$为当前下落过程中的一个下落组，且$G$在$S$中可以下落一层。
 				记
 				$$
 				D_G=\{p\in G\mid \tau_p\neq c\},
@@ -482,77 +560,84 @@
 				也就是说，$G$中的非晶体块整体下落一层，$G$中的晶体块被删除，其他位置保持不变。
 			\end{definition}
 			
-			一次下落之后，原最大粘连组中的晶体被删除，剩余的非晶体部分可能不再保持粘连连通。
-			因此需要在下落后的图形中重新识别这些剩余部分形成的最大粘连组。
-			这些新形成的组将在后续下落过程中继续被处理。
+			一次下落之后，原下落组中的晶体被删除，剩余的非晶体部分可能不再保持粘连连通。
+			因此需要在下落后的图形中，仅在该下落组的剩余部分内部重新识别后继组。
+			根据不重粘连原则，这些后继组不会与外部下落组重新合并，而是在后续下落过程中继续作为独立下落组被处理。
 			
 			\begin{definition}[下落后继组]
-				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$，且$G$在$S$中可以下落一层。
+				设$S\in\mathbb{S}$，$G\subseteq U_S$为当前下落过程中的一个下落组，且$G$在$S$中可以下落一层。
 				记
 				$$
-				D_G=\{p\in G\mid \tau_p\neq c\}
-				$$
-				为$G$中的非晶体位置集合，并记
-				$$
+				D_G=\{p\in G\mid \tau_p\neq c\},
+				\qquad
 				D_G^\downarrow=\{(i+1,j)\mid (i,j)\in D_G\}.
 				$$
 				令
 				$$
 				S'=\Phi_G(S).
 				$$
-				定义$G$在一次下落后产生的\textbf{下落后继组集合}为
-				$$
-				\operatorname{Succ}_S(G)
-				=
-				\{H\in\mathcal{G}(S')\mid H\subseteq D_G^\downarrow\}.
-				$$
 				
-				也就是说，$\operatorname{Succ}_S(G)$由$G$下落并删除晶体后剩余部分在新图形中形成的最大粘连组组成。
+				在$D_G^\downarrow$上定义内部直接粘连关系如下：
+				对任意$p,q\in D_G^\downarrow$，称$p$与$q$在$D_G^\downarrow$内部直接粘连，当且仅当
+				$$
+				p\sim_{S'}q.
+				$$
+				由该内部直接粘连关系生成的连通分量称为$G$在一次下落后的\textbf{下落后继组}。
+				
+				定义$G$在一次下落后产生的下落后继组集合为
+				$$
+				\operatorname{Succ}_S(G).
+				$$
+				也就是说，$\operatorname{Succ}_S(G)$是$D_G^\downarrow$按照$S'$中的粘连规则在自身内部形成的连通分量集合。
+				
+				特别地，若$D_G=\varnothing$，则
+				$$
+				\operatorname{Succ}_S(G)=\varnothing.
+				$$
 			\end{definition}
 			
-			全局下落过程需要反复检查当前图形中的最大粘连组。
+			全局下落过程需要反复检查当前维护的下落组。
 			为了形式化“逐个检查”的过程，我们引入队列规则。
-			队列规则只决定最大粘连组被检查的顺序；后文将证明最终下落结果与该顺序无关。
+			队列规则只决定下落组被检查的顺序；后文将证明最终下落结果与该顺序无关。
 			
 			\begin{definition}[队列规则]
-				一个\textbf{队列规则}是指对任意图形$S\in\mathbb{S}$，给出一个映射
+				一个\textbf{队列规则}是指对任意图形$S\in\mathbb{S}$以及任意有限集合
 				$$
-				\omega_S:\mathcal{P}_{\mathrm{fin}}(\mathcal{G}(S))
-				\longrightarrow
-				\mathcal{G}(S)^{<\omega},
+				\mathcal{A}\subseteq \{G\subseteq U_S\mid G\neq\varnothing\},
 				$$
-				其中$\mathcal{P}_{\mathrm{fin}}(\mathcal{G}(S))$表示$\mathcal{G}(S)$的所有有限子集，
-				$\mathcal{G}(S)^{<\omega}$表示由$\mathcal{G}(S)$中元素构成的有限队列。
-				
-				要求对任意有限集合$\mathcal{A}\subseteq\mathcal{G}(S)$，
-				队列$\omega_S(\mathcal{A})$中的元素恰好为$\mathcal{A}$中的所有元素，且每个元素出现一次。
+				给出一个队列
+				$$
+				\omega_S(\mathcal{A})\in \mathcal{A}^{<\omega}.
+				$$
+				要求队列$\omega_S(\mathcal{A})$中的元素恰好为$\mathcal{A}$中的所有元素，且每个元素出现一次。
 			\end{definition}
 			
 			为了避免将全局下落过程写成非形式化算法，我们把它描述为状态转移系统。
-			一个下落状态由当前图形、待检查队列以及当前轮次是否发生过下落的标记组成。
+			一个下落状态由当前图形、当前维护的下落组划分、待检查队列以及当前轮次是否发生过下落的标记组成。
 			
 			\begin{definition}[下落状态]
-				一个\textbf{下落状态}是一个三元组
+				一个\textbf{下落状态}是一个四元组
 				$$
-				\Sigma=(S,Q,f),
+				\Sigma=(S,\mathcal{P},Q,f),
 				$$
 				其中：
 				\begin{itemize}
 					\item $S\in\mathbb{S}$是当前图形；
-					\item $Q$是由当前图形中的最大粘连组构成的有限队列；
+					\item $\mathcal{P}$是当前图形$S$中的一个下落组划分；
+					\item $Q$是由$\mathcal{P}$中的下落组构成的有限队列；
 					\item $f\in\{\mathrm{false},\mathrm{true}\}$表示当前轮次中是否已经发生过下落。
 				\end{itemize}
 			\end{definition}
 			
 			下落状态转移描述了全局下落过程中的一步计算。
-			若队列非空，则取出队首最大粘连组并判断其是否可下落；
+			若队列非空，则取出队首下落组并判断其是否可下落；
 			若队列为空，则根据本轮是否发生过下落决定终止或重新开始新一轮。
 			
 			\begin{definition}[下落状态转移]
 				设$\omega$为一个队列规则。
 				设
 				$$
-				\Sigma=(S,Q,f)
+				\Sigma=(S,\mathcal{P},Q,f)
 				$$
 				为一个下落状态。定义关于$\omega$的一步状态转移
 				$$
@@ -567,35 +652,46 @@
 					$$
 					\Sigma'
 					=
-					\bigl(S,\omega_S(\mathcal{G}(S)),\mathrm{false}\bigr).
+					\bigl(S,\mathcal{P},\omega_S(\mathcal{P}),\mathrm{false}\bigr).
 					$$
-					也就是说，当前轮次中曾发生下落，因此重新计算当前图形的所有最大粘连组，并按照队列规则$\omega$重新入队，开始新一轮。
+					也就是说，当前轮次中曾发生下落，因此保持当前下落组划分不变，并按照队列规则$\omega$重新入队，开始新一轮。
 					
 					\item 若$Q$非空，设
 					$$
 					Q=(G,Q_0),
 					$$
-					其中$G$为队首元素，$Q_0$为剩余队列。
+					其中$G$为队首下落组，$Q_0$为剩余队列。
 					
 					\begin{enumerate}
 						\item 若$G$在$S$中不可下落一层，则令
 						$$
 						\Sigma'
 						=
-						(S,Q_0,f).
+						(S,\mathcal{P},Q_0,f).
 						$$
 						
 						\item 若$G$在$S$中可以下落一层，则令
 						$$
 						S'=\Phi_G(S),
+						\qquad
+						\mathcal{R}=\operatorname{Succ}_S(G).
 						$$
-						并令
+						根据不重粘连原则，$G$下落后从当前下落组划分中移除，并由其后继组集合$\mathcal{R}$替代。定义新的下落组划分为
+						$$
+						\mathcal{P}'
+						=
+						\bigl(\mathcal{P}\setminus\{G\}\bigr)
+						\cup
+						\mathcal{R}.
+						$$
+						令
 						$$
 						\Sigma'
 						=
 						\bigl(
 						S',
-						Q_0\mathbin{\Vert}\omega_{S'}(\operatorname{Succ}_S(G)),
+						\mathcal{P}',
+						Q_0\mathbin{\Vert}\omega_{S'}(\mathcal{R}),
 						\mathrm{true}
 						\bigr).
 						$$
@@ -603,6 +699,49 @@
 					\end{enumerate}
 				\end{enumerate}
 			\end{definition}
+			
+			\begin{proposition}[下落状态转移的合法性]
+				若
+				$$
+				\Sigma=(S,\mathcal{P},Q,f)
+				$$
+				是一个下落状态，且
+				$$
+				\Sigma\longrightarrow_\omega \Sigma',
+				$$
+				则$\Sigma'$仍是一个下落状态。
+			\end{proposition}
+			
+			\begin{proof}
+				只需考虑发生实际下落的情形。
+				设$G\in\mathcal{P}$可以下落一层，令
+				$$
+				S'=\Phi_G(S),
+				\qquad
+				\mathcal{R}=\operatorname{Succ}_S(G),
+				\qquad
+				\mathcal{P}'=(\mathcal{P}\setminus\{G\})\cup\mathcal{R}.
+				$$
+				由于$\mathcal{P}$是$U_S$的划分，$\mathcal{P}\setminus\{G\}$划分了$U_S\setminus G$。
+				一次下落中，$G$中的晶体块被删除，$G$中的非晶体块移动到$D_G^\downarrow$。
+				又由于$G$可以下落一层，有
+				$$
+				D_G^\downarrow\cap (U_S\setminus G)=\varnothing.
+				$$
+				因此
+				$$
+				U_{S'}
+				=
+				(U_S\setminus G)\cup D_G^\downarrow.
+				$$
+				根据下落后继组定义，$\mathcal{R}$是$D_G^\downarrow$的一个划分。
+				故
+				$$
+				\mathcal{P}'=(\mathcal{P}\setminus\{G\})\cup\mathcal{R}
+				$$
+				是$U_{S'}$的一个划分。
+				队列部分也由$\mathcal{P}'$中的元素构成，因此$\Sigma'$仍是下落状态。
+			\end{proof}
 			
 			给定队列规则后，从任意初始图形出发，下落状态转移会生成一条状态序列。
 			如果该序列在有限步后终止，则终止状态中的图形就是该队列规则下的全局下落结果。
@@ -615,6 +754,7 @@
 				=
 				\bigl(
 				S,
+				\mathcal{G}(S),
 				\omega_S(\mathcal{G}(S)),
 				\mathrm{false}
 				\bigr).
@@ -630,7 +770,7 @@
 				$$
 				若该过程在有限步后终止于
 				$$
-				\Sigma_N^\omega(S)=(S_N,Q_N,f_N),
+				\Sigma_N^\omega(S)=(S_N,\mathcal{P}_N,Q_N,f_N),
 				$$
 				则定义
 				$$
@@ -641,30 +781,30 @@
 			
 			为了后续分析可下落性的传播规律，我们引入两个辅助概念。
 			触地组由于已经到达图形底部而不能继续下落；
-			受支撑组则由于下方存在其他最大粘连组阻挡而不能在当前状态下直接下落。
+			受支撑组则由于下方存在其他下落组阻挡而不能在当前状态下直接下落。
 			
 			\begin{definition}[触地组与受支撑组]
-				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$。
+				设$S\in\mathbb{S}$，$\mathcal{P}$为当前图形$S$中的一个下落组划分，且$G\in\mathcal{P}$。
 				若
 				$$
 				G^\downarrow\not\subseteq I_S,
 				$$
 				则称$G$在$S$中\textbf{触地}。
 				
-				若存在$H\in\mathcal{G}(S)$，$H\neq G$，使得
+				若存在$H\in\mathcal{P}$，$H\neq G$，使得
 				$$
-				H\to_S G,
+				H\to_{S,\mathcal{P}}G,
 				$$
-				则称$G$在$S$中\textbf{受支撑}。
+				则称$G$相对于$\mathcal{P}$在$S$中\textbf{受支撑}。
 			\end{definition}
 			
-			根据可下落的原始定义，一个最大粘连组无法下落只有两类原因：
+			根据可下落的原始定义，一个下落组无法下落只有两类原因：
 			要么其下移后会超出图形底部，要么其下移目标位置被组外非空块占据。
 			这正对应触地与受支撑两个概念。
 			
 			\begin{proposition}[可下落的等价刻画]\label{prop:fallable-characterization}
-				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$。
-				则$G$在$S$中可以下落一层，当且仅当$G$既不触地，也不受支撑。
+				设$S\in\mathbb{S}$，$\mathcal{P}$为当前图形$S$中的一个下落组划分，且$G\in\mathcal{P}$。
+				则$G$在$S$中可以下落一层，当且仅当$G$既不触地，也不相对于$\mathcal{P}$受支撑。
 			\end{proposition}
 			
 			\begin{proof}
@@ -678,99 +818,131 @@
 				$$
 				第一个条件等价于$G$不触地。
 				
-				下面说明第二个条件等价于$G$不受支撑。
+				下面说明第二个条件等价于$G$相对于$\mathcal{P}$不受支撑。
 				若
 				$$
 				G^\downarrow\cap(U_S\setminus G)\neq\varnothing,
 				$$
-				则存在$p=(i,j)\in G$，使得
+				则存在$q=(i,j)\in G$，使得
 				$$
-				p^\downarrow=(i+1,j)\in U_S\setminus G.
+				q^\downarrow=(i+1,j)\in U_S\setminus G.
 				$$
-				设$p^\downarrow\in H$，其中$H\in\mathcal{G}(S)$且$H\neq G$。
-				由于$p^\downarrow$在$p$的正下方相邻，故$p^\downarrow$处的块支撑$p$处的块，从而
+				设$q^\downarrow\in H$，其中$H\in\mathcal{P}$且$H\neq G$。
+				由于$q^\downarrow$在$q$的正下方相邻，故$q^\downarrow$处的块支撑$q$处的块，从而
 				$$
-				H\to_S G.
+				H\to_{S,\mathcal{P}}G.
 				$$
-				于是$G$受支撑。
+				于是$G$相对于$\mathcal{P}$受支撑。
 				
-				反之，若$G$受支撑，则存在$H\neq G$使得$H\to_S G$。
-				由支撑图定义，存在$p\in H$与$q\in G$使得$p$支撑$q$。
-				由于$H$与$G$是不同的最大粘连组，$p$与$q$不可能通过粘连产生支撑；
-				否则二者属于同一最大粘连组。
-				因此只能是$p$在$q$的正下方相邻。
+				反之，若$G$相对于$\mathcal{P}$受支撑，则存在$H\in\mathcal{P}$，$H\neq G$，使得
+				$$
+				H\to_{S,\mathcal{P}}G.
+				$$
+				由下落组之间的支撑关系定义，存在
+				$$
+				p=(i+1,j)\in H,\qquad q=(i,j)\in G.
+				$$
 				于是
 				$$
-				p\in G^\downarrow\cap(U_S\setminus G),
+				p=q^\downarrow\in G^\downarrow\cap(U_S\setminus G),
 				$$
-				故$G^\downarrow\cap(U_S\setminus G)\neq\varnothing$。
-				
-				综上，$G$可下落当且仅当$G$既不触地，也不受支撑。
+				从而
+				$$
+				G^\downarrow\cap(U_S\setminus G)\neq\varnothing.
+				$$
 			\end{proof}
 			
-			接下来考虑不同最大粘连组的下落顺序是否会影响最终结果。
+			接下来考虑不同下落组的下落顺序是否会影响最终结果。
 			关键观察是：一个可下落组执行一次下落时，不会使其他原本不受支撑的外部组突然变为受支撑。
 			换言之，一次下落不会新增指向外部组的阻挡关系。
 			
 			\begin{proposition}[一次下落不新增外部受支撑关系]\label{prop:no-new-external-support}
-				设$S\in\mathbb{S}$，$G\in\mathcal{G}(S)$，且$G$在$S$中可以下落一层。
+				设$\Sigma=(S,\mathcal{P},Q,f)$为一个下落状态。
+				设$G\in\mathcal{P}$，且$G$在$S$中可以下落一层。
 				记
 				$$
-				S'=\Phi_G(S).
+				S'=\Phi_G(S),
+				\qquad
+				\mathcal{R}=\operatorname{Succ}_S(G),
 				$$
-				设$H\in\mathcal{G}(S)$，$H\neq G$，且$H$在$S'$中仍对应为一个最大粘连组。
-				若$H$在$S$中不受支撑，则$H$在$S'$中也不受支撑。
+				并令
+				$$
+				\mathcal{P}'
+				=
+				(\mathcal{P}\setminus\{G\})\cup\mathcal{R}.
+				$$
+				
+				若$H\in\mathcal{P}$，$H\neq G$，且$H$在状态$(S,\mathcal{P})$中不受支撑，
+				则$H$在状态$(S',\mathcal{P}')$中也不受支撑。
 			\end{proposition}
 			
 			\begin{proof}
 				由于$G$可以下落一层，$G^\downarrow$中不存在$G$之外的非空位置。
-				因此$G$下落时不会与任何外部组发生碰撞。
+				因此$G$下落时不会与任何外部下落组发生位置碰撞。
 				
-				设$H\neq G$为另一个最大粘连组。
-				若$H$在$S'$中受支撑，则存在某个最大粘连组$K$，使得
+				设$H\in\mathcal{P}$，$H\neq G$，且$H$在$(S,\mathcal{P})$中不受支撑。
+				注意$H$中的块在这次下落中保持原位，并且$H$仍作为$\mathcal{P}'$中的同一下落组存在。
+				
+				若$H$在$(S',\mathcal{P}')$中受支撑，则存在$K\in\mathcal{P}'$，$K\neq H$，使得
 				$$
-				K\to_{S'}H.
+				K\to_{S',\mathcal{P}'}H.
 				$$
-				若该支撑关系完全由$G$之外的块产生，则相同的支撑关系在$S$中已经存在，
-				从而$H$在$S$中受支撑，矛盾。
 				
-				因此唯一需要考虑的是：该支撑关系是否由$G$下落后的块产生。
-				但$G$整体向下平移一层后，其块只会远离其上方的块，不可能新出现在某个外部组$H$的正下方相邻位置。
-				同时，由假设，下落后的$G$不会与外部组重新粘连。
-				故$G$的下落不会产生指向外部组$H$的新支撑边。
+				若该支撑关系由原来$G$之外的外部下落组产生，则相同的支撑关系在$(S,\mathcal{P})$中已经存在，
+				这与$H$原本不受支撑矛盾。
 				
-				于是$H$在$S'$中不受支撑。
+				因此唯一可能的新来源是$G$下落后产生的某个后继组$K\in\mathcal{R}$。
+				若$K$在$(S',\mathcal{P}')$中动态支撑$H$，则存在
+				$$
+				p\in K,\qquad q\in H
+				$$
+				使得$p=q^\downarrow$。
+				由于$K\subseteq D_G^\downarrow\subseteq G^\downarrow$，且$H\subseteq U_S\setminus G$，于是
+				$$
+				p\in G^\downarrow\cap(U_S\setminus G),
+				$$
+				这与$G$在$S$中可以下落一层矛盾。
+				因此$G$的一次下落不会产生新的指向外部下落组$H$的动态支撑关系。
 			\end{proof}
 			
-			由上述性质可知，如果两个最大粘连组在同一状态下都可以下落，那么先下落其中一个不会破坏另一个的可下落性。
+			由上述性质可知，如果两个下落组在同一状态下都可以下落，那么先下落其中一个不会破坏另一个的可下落性。
 			这给出了可下落组之间的保持性。
 			
 			\begin{proposition}[可下落组的保持性]\label{prop:fallable-preservation}
-				设$S\in\mathbb{S}$，$G,H\in\mathcal{G}(S)$，且$G\neq H$。
-				若$G$与$H$在$S$中都可以下落一层，则$H$在$\Phi_G(S)$中仍可以下落一层。
+				设$\Sigma=(S,\mathcal{P},Q,f)$为一个下落状态。
+				设$G,H\in\mathcal{P}$，且$G\neq H$。
+				若$G$与$H$在$S$中都可以下落一层，则在$G$执行一次下落后的状态中，$H$仍可以下落一层。
 			\end{proposition}
 			
 			\begin{proof}
 				记
 				$$
-				S'=\Phi_G(S).
+				S'=\Phi_G(S),
+				\qquad
+				\mathcal{R}=\operatorname{Succ}_S(G),
 				$$
-				由于$H$在$S$中可以下落一层，由\cref{prop:fallable-characterization}可知，$H$既不触地，也不受支撑。
+				并令
+				$$
+				\mathcal{P}'=(\mathcal{P}\setminus\{G\})\cup\mathcal{R}.
+				$$
 				
-				首先，$G$的下落不会改变$H$的位置，因此$H$是否触地不变。
+				由于$H$在$S$中可以下落一层，由\cref{prop:fallable-characterization}可知，$H$既不触地，也不相对于$\mathcal{P}$受支撑。
+				
+				首先，$G$的一次下落不会改变$H$的位置，因此$H$是否触地不变。
 				故$H$在$S'$中仍不触地。
 				
-				其次，由\cref{prop:no-new-external-support}，$G$的下落不会使原本不受支撑的外部组$H$变为受支撑。
-				因此$H$在$S'$中仍不受支撑。
+				其次，由\cref{prop:no-new-external-support}，$G$的一次下落不会使原本不受支撑的外部下落组$H$变为受支撑。
+				因此$H$在$(S',\mathcal{P}')$中仍不受支撑。
 				
 				再由\cref{prop:fallable-characterization}可知，$H$在$S'$中仍可以下落一层。
 			\end{proof}
 			
-			进一步地，两个同时可下落的最大粘连组不仅不会互相阻止，而且它们的一次下落操作可以交换顺序。
+			进一步地，两个同时可下落的下落组不仅不会互相阻止，而且它们的一次下落操作可以交换顺序。
 			这一交换律是证明队列顺序无关性的核心。
 			
 			\begin{proposition}[可下落组的一次下落交换律]\label{prop:fall-commutation}
-				设$S\in\mathbb{S}$，$G,H\in\mathcal{G}(S)$，且$G\neq H$。
+				设$\Sigma=(S,\mathcal{P},Q,f)$为一个下落状态。
+				设$G,H\in\mathcal{P}$，且$G\neq H$。
 				若$G$与$H$在$S$中都可以下落一层，则
 				$$
 				\Phi_H(\Phi_G(S))
@@ -780,7 +952,7 @@
 			\end{proposition}
 			
 			\begin{proof}
-				由于$G$与$H$是不同的最大粘连组，故
+				由于$G$与$H$是同一下落组划分$\mathcal{P}$中的不同下落组，故
 				$$
 				G\cap H=\varnothing.
 				$$
@@ -798,6 +970,8 @@
 				两种执行顺序中，$G$中的非晶体块均向下平移一层，$G$中的晶体块均被删除；
 				$H$中的非晶体块均向下平移一层，$H$中的晶体块均被删除；
 				而$G\cup H$之外的块保持不变。
+				
+				根据下落过程的不重粘连原则，两种顺序均不会引入与外部下落组的重新粘连。
 				因此两种顺序得到的图形相同，即
 				$$
 				\Phi_H(\Phi_G(S))
@@ -832,7 +1006,7 @@
 			\end{proof}
 			
 			终止性保证了每个队列规则都会给出一个有限的下落结果。
-			接下来证明，该结果事实上与队列中最大粘连组的检查顺序无关。
+			接下来证明，该结果事实上与队列中下落组的检查顺序无关。
 			直观上，这是因为同时可下落的组的一次下落操作可以交换，而不可下落的组只会被跳过。
 			
 			\begin{proposition}[队列顺序无关性]\label{prop:queue-independence}
@@ -851,8 +1025,8 @@
 				由\cref{prop:fall-termination}，从$S$出发的任意队列规则下，下落状态转移过程均在有限步后终止。
 				
 				考虑任意一次轮次中的队列处理。
-				在该轮次中，真正发生的一次下落总是选取当前图形中某个可以下落一层的最大粘连组。
-				由\cref{prop:fallable-preservation}，若两个不同最大粘连组在同一状态下均可以下落，则先下落其中一个不会使另一个变为不可下落。
+				在该轮次中，真正发生的一次下落总是选取当前图形中某个可以下落一层的下落组。
+				由\cref{prop:fallable-preservation}，若两个不同下落组在同一状态下均可以下落，则先下落其中一个不会使另一个变为不可下落。
 				由\cref{prop:fall-commutation}，这两个一次下落操作的执行顺序可以交换，且交换后得到的图形相同。
 				
 				因此，在任意有限下落序列中，若相邻两次实际下落操作的执行对象在同一状态下均可下落，则可以交换它们而不改变最终图形。
@@ -864,6 +1038,8 @@
 				=
 				\operatorname{Fall}_{\omega_2}(S).
 				$$
+				
+				由于每次实际下落的后继组只由该下落组自身决定，并且不会与外部下落组重新粘连，故交换两个同时可下落的下落操作不仅不改变当前图形，也不改变后续可检查的下落组集合。
 			\end{proof}
 			
 			由队列顺序无关性可知，虽然全局下落过程的中间状态可能依赖队列规则，但最终得到的图形并不依赖队列规则。
@@ -884,7 +1060,7 @@
 			\end{definition}
 			
 			全局下落映射描述了图形在重力机制作用下达到的结果。
-			若一个图形经过全局下落后保持不变，则说明其中没有任何最大粘连组能够继续下落。
+			若一个图形经过全局下落后保持不变，则说明从其初始最大粘连组划分出发，没有任何下落组能够继续下落。
 			这样的图形称为稳定图形。
 			
 			\begin{definition}[稳定图形]
@@ -905,17 +1081,27 @@
 		\subsection{下落过程的不动点刻画}
 			
 			上一节通过队列状态转移定义了全局下落过程。
-			这种定义贴近游戏执行逻辑，但在分析图形结构时并不总是方便。
-			本节给出下落过程的一个静态刻画：将最大粘连组视为支撑图中的顶点，通过支撑关系从触地组开始向上传播不可下落性。
+			在该过程中，初始下落组划分取为图形的最大粘连组划分；
+			之后每次下落只在当前下落组自身内部产生后继组，而不会与外部下落组重新粘连。
+			这种定义贴近游戏执行逻辑，但在分析初始图形中哪些部分会保持不动时并不总是方便。
+			
+			本节给出下落过程的一个静态刻画。
+			具体地，我们把初始图形$S$中的最大粘连组视为支撑图中的顶点，
+			通过初始支撑关系从触地组开始向上传播不可下落性。
 			在存在循环支撑结构时，循环中的最大粘连组也会由于相互支撑而保持不动。
 			这一现象可以用支撑闭包算子的不动点统一描述。
 			
-			若一批最大粘连组已经确定不会下落，则它们直接支撑的最大粘连组也不会首先下落。
+			需要强调的是，本节中的支撑图、支撑闭包算子以及不动点均相对于初始图形$S$及其初始最大粘连组划分$\mathcal{G}(S)$定义；
+			它们刻画的是初始最大粘连组在全局下落过程开始后是否会发生第一次下落。
+			
+			若一批初始最大粘连组已经确定不会发生第一次下落，则它们直接支撑的初始最大粘连组也不会首先下落。			
 			因此，可以从触地组出发，沿支撑边不断向上传播“不可下落”的性质。
 			下面的支撑闭包算子正是对这一传播过程的形式化。
 			
 			\begin{definition}[支撑闭包算子]
 				设$S\in\mathbb{S}$。
+				本定义中的所有最大粘连组均指初始图形$S$中的最大粘连组。
+				
 				定义$S$中的触地组集合为
 				$$
 				\mathcal{B}_S
@@ -1015,6 +1201,25 @@
 				为$\Theta_S$的\textbf{最大不动点}。
 			\end{definition}
 			
+			由于$\Theta_S$是单调映射，且
+			$$
+			\Theta_S(\mathcal{G}(S))\subseteq\mathcal{G}(S),
+			$$
+			从全集出发的迭代序列满足
+			$$
+			\mathcal{M}_{n+1}\subseteq\mathcal{M}_n.
+			$$
+			又因为
+			$$
+			\mathcal{L}_0=\varnothing\subseteq\Theta_S(\varnothing)=\mathcal{L}_1,
+			$$
+			由单调性可知从空集出发的迭代序列满足
+			$$
+			\mathcal{L}_n\subseteq\mathcal{L}_{n+1}.
+			$$
+			由于$\mathcal{G}(S)$有限，二者均在有限步后稳定。
+			又由于$\mathcal{G}(S)$有限，二者均在有限步后稳定。
+			
 			在没有循环支撑结构的情况下，支撑图是有向无环图。
 			此时不可下落性只能从触地组向上传播，不会凭空由循环支撑产生。
 			因此最小不动点与最大不动点应当一致。
@@ -1029,20 +1234,39 @@
 			
 			\begin{proof}
 				由于$\Gamma_S$中不存在循环支撑结构，$\Gamma_S$是有向无环图。
-				在有向无环图中，任意最大粘连组$G$若不从某个触地组出发可达，则不存在由触地组向上蔓延到$G$的支撑路径。
-				
 				最小不动点$\mu\Theta_S$正是从触地组集合$\mathcal{B}_S$出发，沿支撑边反复向上扩张所得的集合，即
 				$$
 				\mu\Theta_S
 				=
-				\{G\in\mathcal{G}(S)\mid \exists B\in\mathcal{B}_S,\ B\leadsto_S G\}
-				\cup \mathcal{B}_S.
+				\mathcal{B}_S
+				\cup
+				\{G\in\mathcal{G}(S)\mid \exists B\in\mathcal{B}_S,\ B\leadsto_S G\}.
 				$$
 				
-				另一方面，在无环图中，若一个最大粘连组不从触地组可达，则它所在的向下支撑链最终不能回到自身，也不能到达触地组，因此它不可能属于任何不动点。
-				所以任意不动点都包含于上述由触地组向上可达的集合。
+				设$\mathcal{X}$为$\Theta_S$的任意不动点。
+				若$G\in\mathcal{X}$且$G\notin\mathcal{B}_S$，由
+				$$
+				\mathcal{X}=\Theta_S(\mathcal{X})
+				$$
+				可知，存在$H\in\mathcal{X}$使得
+				$$
+				H\to_S G.
+				$$
+				若$H\notin\mathcal{B}_S$，则同理可以继续向前追溯。
+				因为$\Gamma_S$有限且无有向环，这一追溯过程不可能无限进行，也不可能回到已经出现过的顶点。
+				因而最终必须到达某个触地组$B\in\mathcal{B}_S$。
+				于是存在支撑路径
+				$$
+				B\leadsto_S G,
+				$$
+				从而$G\in\mu\Theta_S$。
 				
-				因此$\Theta_S$只有一个不动点，从而
+				因此任意不动点$\mathcal{X}$均满足
+				$$
+				\mathcal{X}\subseteq\mu\Theta_S.
+				$$
+				另一方面，$\mu\Theta_S$本身是不动点，所以它也是唯一不动点。
+				特别地，
 				$$
 				\mu\Theta_S=\nu\Theta_S.
 				$$
@@ -1076,11 +1300,7 @@
 				\mid
 				\exists G\in \mathcal{B}_S\cup \mathcal{Z}_S,\ 
 				G\leadsto_S H
-				\}
-				\cup
-				\mathcal{B}_S
-				\cup
-				\mathcal{Z}_S.
+				\}.
 				$$
 				也就是说，最大不动点由触地组、循环支撑结构中的组，以及它们沿支撑关系向上蔓延得到的所有组组成。
 			\end{proposition}
@@ -1088,34 +1308,81 @@
 			\begin{proof}
 				记右侧集合为$\mathcal{N}$。
 				
-				首先，$\mathcal{B}_S\subseteq \mathcal{N}$。
-				若$G\in\mathcal{N}$且$G\to_S H$，则由支撑路径的定义可知$H$仍可由$\mathcal{B}_S\cup\mathcal{Z}_S$中的某个元素到达，故$H\in\mathcal{N}$。
-				因此
+				首先证明$\mathcal{N}$是不动点。
+				显然有
+				$$
+				\mathcal{B}_S\subseteq\mathcal{N}.
+				$$
+				若$G\in\mathcal{N}$且$G\to_S H$，则$H$仍可由$\mathcal{B}_S\cup\mathcal{Z}_S$中的某个元素沿支撑路径到达，
+				因而$H\in\mathcal{N}$。
+				故
 				$$
 				\Theta_S(\mathcal{N})\subseteq\mathcal{N}.
 				$$
-				另一方面，由$\mathcal{N}$的构造，$\mathcal{N}$中的每个元素要么属于$\mathcal{B}_S$，要么属于某个循环支撑结构，或由前二者沿支撑边到达。
-				触地组显然属于$\Theta_S(\mathcal{N})$；循环支撑结构中的每个组都由同一循环中的前一个组支撑，故也属于$\Theta_S(\mathcal{N})$；其上方闭包中的元素也由路径上的前一个元素支撑。
+				
+				反过来，取任意$H\in\mathcal{N}$。
+				若$H\in\mathcal{B}_S$，则由定义$H\in\Theta_S(\mathcal{N})$。
+				若$H\in\mathcal{Z}_S$，则$H$属于某个循环支撑结构，因此存在$G\in\mathcal{Z}_S\subseteq\mathcal{N}$使得
+				$$
+				G\to_S H.
+				$$
+				故$H\in\Theta_S(\mathcal{N})$。
+				若$H$不属于前两类，则由$\mathcal{N}$的定义，存在
+				$$
+				G_0\in\mathcal{B}_S\cup\mathcal{Z}_S
+				$$
+				以及一条非空支撑路径
+				$$
+				G_0\to_S G_1\to_S\cdots\to_S H.
+				$$
+				设该路径为
+				$$
+				G_0\to_S G_1\to_S\cdots\to_S G_m=H,
+				\qquad m\geq 1.
+				$$
+				则$G_{m-1}\in\mathcal{N}$且
+				$$
+				G_{m-1}\to_S H.
+				$$
+				故$H\in\Theta_S(\mathcal{N})$。
+				
 				因此
 				$$
 				\mathcal{N}\subseteq\Theta_S(\mathcal{N}).
 				$$
-				于是
+				综上，
 				$$
-				\Theta_S(\mathcal{N})=\mathcal{N},
+				\Theta_S(\mathcal{N})=\mathcal{N}.
 				$$
-				即$\mathcal{N}$是不动点。
 				
-				任意不动点若包含某个非触地且不处于循环支撑结构向上闭包中的元素，则沿支撑关系不断向下追溯，由于图形有限，最终要么到达触地组，要么进入循环。
-				若二者都不发生，则不可能维持不动点条件。
-				因此任意不动点均包含于$\mathcal{N}$。
-				故$\mathcal{N}$为最大不动点，即
+				下面证明$\mathcal{N}$是最大不动点。
+				设$\mathcal{X}$为任意不动点，取$H\in\mathcal{X}$。
+				若$H\in\mathcal{B}_S$，则$H\in\mathcal{N}$。
+				若$H\notin\mathcal{B}_S$，由
+				$$
+				\mathcal{X}=\Theta_S(\mathcal{X})
+				$$
+				可知，存在$H_1\in\mathcal{X}$使得
+				$$
+				H_1\to_S H.
+				$$
+				若$H_1\notin\mathcal{B}_S$，则继续向前追溯。
+				由于$\mathcal{G}(S)$有限，这一追溯过程最终要么到达某个触地组，要么出现重复顶点并形成有向环。
+				
+				若最终到达触地组，则$H$由某个触地组沿支撑路径可达，故$H\in\mathcal{N}$。
+				若形成有向环，则该有向环中的顶点属于$\mathcal{Z}_S$，而$H$由该循环支撑核中的某个顶点沿支撑路径可达，故$H\in\mathcal{N}$。
+				
+				因此任意不动点$\mathcal{X}$均满足
+				$$
+				\mathcal{X}\subseteq\mathcal{N}.
+				$$
+				于是$\mathcal{N}$为最大不动点，即
 				$$
 				\nu\Theta_S=\mathcal{N}.
 				$$
 			\end{proof}
 			
-			由上述刻画可知，最大不动点正好描述了在静态支撑图中应当保持不动的最大粘连组。
+			由上述刻画可知，最大不动点正好描述了在初始静态支撑图中应当保持不动的初始最大粘连组。			
 			因此我们将其作为静态不可下落组集合，并将其补集称为静态可下落组集合。
 			
 			\begin{definition}[静态不可下落组]
@@ -1136,40 +1403,77 @@
 			\end{definition}
 			
 			接下来说明，上述静态定义并不仅仅是图论上的构造，它与队列式全局下落过程中的实际行为一致。
-			也就是说，一个初始最大粘连组是否会在全局下落过程中发生下落，可以由支撑闭包算子的最大不动点完全决定。
+			也就是说，一个初始最大粘连组是否会在全局下落过程中发生第一次下落，可以由支撑闭包算子的最大不动点完全决定。
 			
-			\begin{proposition}[不可下落组的不动点刻画]\label{prop:nonfalling-fixed-point}
+			\begin{proposition}[不可下落初始组的不动点刻画]\label{prop:nonfalling-fixed-point}
 				设$S\in\mathbb{S}$。
-				在从$S$出发的全局下落过程中，初始最大粘连组中不会执行下落的部分恰为
+				从初始下落状态
+				$$
+				\Sigma_0^\omega(S)
+				=
+				\bigl(S,\mathcal{G}(S),\omega_S(\mathcal{G}(S)),\mathrm{false}\bigr)
+				$$
+				出发进行全局下落。
+				则初始最大粘连组中不会发生第一次下落的组恰为
 				$$
 				\mathcal{N}(S)=\nu\Theta_S.
 				$$
-				换言之，一个初始最大粘连组$G\in\mathcal{G}(S)$不会在下落过程中发生下落，当且仅当
+				换言之，对任意$G\in\mathcal{G}(S)$，$G$在全局下落过程中始终保持不动，当且仅当
 				$$
 				G\in\nu\Theta_S.
 				$$
 			\end{proposition}
 			
 			\begin{proof}
-				首先，触地组不可能下落。
-				若$G$不会下落且$G\to_S H$，则$H$始终受到$G$的支撑，因此$H$也不会下落。
-				所以所有不会下落的组构成$\Theta_S$的不动点，故包含于最大不动点$\nu\Theta_S$。
+				记全局下落过程中始终不发生第一次下落的初始最大粘连组集合为$\mathcal{X}$。
+				
+				首先，任意触地组都不可能下落，因此
+				$$
+				\mathcal{B}_S\subseteq\mathcal{X}.
+				$$
+				若$G\in\mathcal{X}$且$G\to_S H$，则在初始状态中$H$受到$G$的支撑。
+				由于$G$始终不发生下落，并且全局下落过程不产生外部重粘连，$G$对$H$的阻挡不会因其他下落组的运动而消失。
+				因此$H$也不可能先于$G$发生下落，从而$H\in\mathcal{X}$。
+				故
+				$$
+				\Theta_S(\mathcal{X})\subseteq\mathcal{X}.
+				$$
+				又由$\mathcal{B}_S\subseteq\mathcal{X}$以及上述支撑闭包性，实际上有
+				$$
+				\Theta_S(\mathcal{X})=\mathcal{X}.
+				$$
+				因此$\mathcal{X}$是$\Theta_S$的不动点。
+				于是
+				$$
+				\mathcal{X}\subseteq\nu\Theta_S.
+				$$
 				
 				反过来，设$G\in\nu\Theta_S$。
 				由于$\nu\Theta_S$是不动点，若$G$不是触地组，则存在$H\in\nu\Theta_S$使得
 				$$
 				H\to_S G.
 				$$
-				也就是说，$\nu\Theta_S$中的每个非触地组都受到同在$\nu\Theta_S$中的某个组支撑。
-				因此$\nu\Theta_S$中的组要么由触地组向上支撑得到，要么处在循环支撑结构及其上方支撑闭包中。
-				触地组不会下落；循环支撑结构中的组相互支撑，因而没有任何一个能首先下落；其上方闭包中的组又被这些不下落的组支撑。
-				故$\nu\Theta_S$中的组均不会下落。
+				因而$\nu\Theta_S$中的每个非触地组都受到同在$\nu\Theta_S$中的某个组支撑。
+				由最大不动点的循环刻画，$\nu\Theta_S$由触地组、循环支撑核以及它们沿支撑关系向上可达的组组成。
 				
-				综上，不会下落的组恰为$\nu\Theta_S$。
+				触地组不能下落；
+				循环支撑结构中的组相互支撑，因而没有任何一个组能够首先下落；
+				而由这些组向上支撑到的组始终受到下方不下落组的阻挡。
+				根据下落过程的不重粘连原则，其他下落组的运动不会破坏这些初始支撑依赖。
+				因此$\nu\Theta_S$中的初始最大粘连组均不会发生第一次下落。
+				于是
+				$$
+				\nu\Theta_S\subseteq\mathcal{X}.
+				$$
+				
+				综上，
+				$$
+				\mathcal{X}=\nu\Theta_S.
+				$$
 			\end{proof}
 			
 			有了不可下落组的不动点刻画后，可以将队列式下落过程改写为一个更静态的过程：
-			先找出保持不动的最大粘连组，再删除会下落部分中的晶体，最后让其余可下落部分按自底向上的顺序稳定下来。
+			先找出保持不动的初始最大粘连组，再删除会发生第一次下落部分中的晶体，最后让其余可动部分按照同一不重粘连规则继续下落直至稳定。
 			这一过程称为静态下落过程。
 			
 			\begin{definition}[静态下落过程]
@@ -1178,17 +1482,17 @@
 				$$
 				\mathcal{N}(S)=\nu\Theta_S
 				$$
-				为静态不可下落组集合，令
+				为静态不可下落初始组集合，令
 				$$
 				\mathcal{F}(S)=\mathcal{G}(S)\setminus\mathcal{N}(S)
 				$$
-				为静态可下落组集合。
+				为静态可下落初始组集合。
 				
 				记静态可下落部分的位置集合为
 				$$
 				P_{\mathrm{fall}}(S)
 				=
-				\bigcup_{G\in\mathcal{F}(S)}G.
+				\bigcup_{G\in\mathcal{F}(S)}G,
 				$$
 				记其中的晶体位置集合为
 				$$
@@ -1201,11 +1505,18 @@
 				$$
 				S^{\ast}=S\setminus C_{\mathrm{fall}}(S).
 				$$
-				然后保持$\mathcal{N}(S)$中的所有块不动，将其余非空块按照从下到上的顺序依次下落，直到不能继续下落为止。
+				然后保持$\mathcal{N}(S)$中所有初始组的位置不动。
+				对每个$G\in\mathcal{F}(S)$，先删除其中的晶体，并将其非晶体剩余部分按照内部粘连关系分解为若干后继下落组；
+				这些后继下落组随后按照全局下落过程的不重粘连规则继续执行下落，直到所有可下落部分稳定。
 				所得图形记为
 				$$
 				\operatorname{Fall}_{\mathrm{st}}(S).
 				$$
+				所得图形记为
+				$$
+				\operatorname{Fall}_{\mathrm{st}}(S).
+				$$
+				等价地，静态下落过程将$\mathcal{F}(S)$中的每个初始组视为已经发生第一次下落：其中晶体被删除，非晶体部分进入后续下落过程。
 			\end{definition}
 			
 			静态下落过程的目的是摆脱队列顺序的细节，直接从支撑结构判断哪些部分保持不动，哪些部分需要下落。
@@ -1214,47 +1525,67 @@
 			\begin{theorem}[队列下落与静态下落的等价性]
 				对任意图形$S\in\mathbb{S}$，都有
 				$$
-				\operatorname{Fall}(S)
-				=
-				\operatorname{Fall}_{\mathrm{st}}(S).
-				$$
-			\end{theorem}
-			
-			\begin{proof}
-				由\cref{prop:nonfalling-fixed-point}，队列式下落过程中不会下落的初始最大粘连组恰为
-				$$
-				\mathcal{N}(S)=\nu\Theta_S.
-				$$
-				因此这些组中的块在两种下落过程中均保持不动。
-				
-				对补集
-				$$
-				\mathcal{F}(S)=\mathcal{G}(S)\setminus\mathcal{N}(S)
-				$$
-				中的最大粘连组，它们在队列式下落过程中都会执行至少一次下落。
-				每个执行下落的组在第一次下落时，其内部晶体都会被删除。
-				因此队列式下落中被删除的晶体位置正是
-				$$
-				C_{\mathrm{fall}}(S)
-				=
-				P_{\mathrm{fall}}(S)\cap C_S.
-				$$
-				
-				删除这些晶体后，剩余的可下落部分不再受到$\mathcal{N}(S)$之外的稳定支撑。
-				由队列顺序无关性，剩余部分的具体处理顺序不影响最终结果。
-				因此可以等价地按照从下到上的顺序处理下落。
-				
-				故静态下落过程得到的图形与队列式全局下落过程得到的图形相同，即
-				$$
 				\operatorname{Fall}_{\mathrm{st}}(S)
 				=
 				\operatorname{Fall}(S).
 				$$
+				其中，在全局下落过程中保持不动的初始最大粘连组恰为
+				$$
+				\mathcal{N}(S)=\nu\Theta_S.
+				$$
+			\end{theorem}
+			
+			\begin{proof}
+				记全局下落过程中始终不发生第一次下落的初始最大粘连组集合为$\mathcal{X}$。
+				
+				首先证明
+				$$
+				\nu\Theta_S\subseteq\mathcal{X}.
+				$$
+				由最大不动点的循环刻画，$\nu\Theta_S$由触地组、循环支撑核以及它们沿初始支撑关系向上可达的组组成。
+				
+				触地组由于已经到达图形底部，不可能发生下落。
+				对于循环支撑结构，若其中存在第一个发生下落的组，则在它下落之前，循环中直接支撑它的前一个组尚未下落，因此它仍受支撑，矛盾。
+				故循环支撑结构中的组均不会发生第一次下落。
+				
+				又若某个组受到已经不会下落的组支撑，则由于下落过程不产生外部重粘连，且该支撑组始终保持原位，这一支撑阻挡不会因其他下落组的运动而消失。
+				因此由触地组或循环支撑结构沿支撑关系向上可达的组也不会发生第一次下落。
+				于是
+				$$
+				\nu\Theta_S\subseteq\mathcal{X}.
+				$$
+				
+				反过来证明
+				$$
+				\mathcal{X}\subseteq\nu\Theta_S.
+				$$
+				取任意
+				$$
+				G\in\mathcal{G}(S)\setminus\nu\Theta_S.
+				$$
+				由最大不动点的循环刻画，$G$不在任何触地组或循环支撑核的向上支撑闭包中。
+				因而在只考虑$\mathcal{G}(S)\setminus\nu\Theta_S$所诱导的支撑依赖时，从$G$向下追溯其支撑来源，不可能到达触地组，也不可能进入循环。
+				由于$\mathcal{G}(S)$有限，该追溯过程必然终止于某个非触地且不受支撑的初始最大粘连组$G_0$。
+				
+				由\cref{prop:fallable-characterization}，$G_0$在初始状态中可以下落一层。
+				当$G_0$发生下落后，根据下落过程的不重粘连原则以及\cref{prop:no-new-external-support}，不会产生新的外部支撑来阻止原本依赖于$G_0$的上方组。
+				因此沿着从$G_0$到$G$的支撑路径，支撑阻挡会依次解除；由终止性和队列顺序无关性，这些解除不依赖具体队列顺序。
+				于是$G$最终也会发生第一次下落。
+				
+				因而任何不属于$\nu\Theta_S$的初始最大粘连组都不属于$\mathcal{X}$，即
+				$$
+				\mathcal{X}\subseteq\nu\Theta_S.
+				$$
+				
+				综上，
+				$$
+				\mathcal{X}=\nu\Theta_S.
+				$$
 			\end{proof}
 			
 			因此，队列式下落与支撑不动点刻画给出了同一机制的两种描述。
-			前者适合模拟游戏执行过程，后者适合分析图形结构，尤其适合研究循环支撑结构对下落结果的影响。
-			后续若只关心哪些最大粘连组最终保持不动，可以直接使用支撑闭包算子的最大不动点。
+			前者适合模拟游戏执行过程，后者适合分析初始图形的支撑结构，尤其适合研究循环支撑结构对下落结果的影响。
+			后续若只关心哪些初始最大粘连组在全局下落中保持不动，可以直接使用支撑闭包算子的最大不动点。
 			
 		\subsection{晶体机制}
 			
@@ -1263,7 +1594,7 @@
 			此外，某些操作会删除超过高度上限的部分，若被删除部分包含晶体，也会触发相应晶体簇的破碎。
 			因此本节先定义晶体簇，再定义晶体破碎和超上限删除。
 			
-			晶体簇只考虑晶体之间的上下左右邻接关系，与前文定义的粘连组不同。
+			晶体簇只考虑晶体类型的位置连通性，与晶体颜色无关，也与前文的下落组划分无关。
 			
 			\begin{definition}[晶体簇]
 				设$S\in\mathbb{S}$。
@@ -1318,6 +1649,8 @@
 			除了显式的晶体破碎外，超上限删除也可能间接触发晶体破碎。
 			当图形的高度超过某个上限时，上方超出部分会被删除；
 			若这部分中含有晶体，则这些晶体所在的晶体簇也会一并破碎。
+			超上限删除的输出图形高度规定为该高度上限本身；
+			若输入图形高度不足该上限，则在上方补空层，使输出仍然具有指定高度。
 			
 			\begin{definition}[超上限删除]
 				设$S\in\mathbb{S}$，记
@@ -1326,28 +1659,63 @@
 				\qquad
 				w=\operatorname{wd}(S).
 				$$
-				给定高度上限$\ell\in\mathbb{N}$，其中$0\leq \ell\leq h$。
+				给定高度上限
+				$$
+				\ell\in\mathbb{N}_{+}.
+				$$
+				
 				定义$S$中超过高度上限$\ell$的上方位置集合为
 				$$
 				O_\ell(S)
 				=
-				\{(i,j)\in I_S\mid i\leq h-\ell\}.
+				\{(i,j)\in I_S\mid i\leq \max(h-\ell,0)\}.
 				$$
-				也就是说，$O_\ell(S)$是位于自底向上第$\ell$层以上的所有位置。
+				也就是说，当$h>\ell$时，$O_\ell(S)$为输入图形中高于最下方$\ell$层的所有位置；
+				当$h\leq \ell$时，$O_\ell(S)=\varnothing$。
 				
-				若$O_\ell(S)$中存在晶体，则这些晶体所在的晶体簇均会破碎。定义由超上限区域触发破碎的晶体位置集合为
+				若$O_\ell(S)$中存在晶体，则这些晶体所在的晶体簇均会破碎。
+				定义由超上限区域触发破碎的晶体位置集合为
 				$$
 				X_\ell(S)
 				=
 				\bigcup_{p\in O_\ell(S)\cap C_S}[p]^c_S.
 				$$
-				
-				定义$S$关于高度上限$\ell$的\textbf{超上限删除结果}为
+				若$O_\ell(S)\cap C_S=\varnothing$，则约定
 				$$
-				\operatorname{Clip}_\ell(S)
+				X_\ell(S)=\varnothing.
+				$$
+				
+				先在原图形$S$中删除超上限区域以及由其触发破碎的晶体簇，得到
+				$$
+				\widehat{S}
 				=
 				S\setminus\bigl(O_\ell(S)\cup X_\ell(S)\bigr).
 				$$
+				
+				定义$S$关于高度上限$\ell$的\textbf{超上限删除结果}
+				$$
+				\operatorname{Clip}_\ell(S)\in\mathbb{B}^{\ell\times w}
+				$$
+				为底部对齐的$\ell$层输出图形。具体地，对任意
+				$$
+				(r,j)\in\{1,\dots,\ell\}\times\{1,\dots,w\},
+				$$
+				令
+				$$
+				i=h-\ell+r.
+				$$
+				定义
+				$$
+				\bigl(\operatorname{Clip}_\ell(S)\bigr)_{(r,j)}
+				=
+				\begin{cases}
+					\widehat{S}_{(i,j)}, & 1\leq i\leq h,\\
+					\mathbf{0}, & i<1.
+				\end{cases}
+				$$
+				换言之，若$h\geq\ell$，则$\operatorname{Clip}_\ell(S)$取$\widehat{S}$的最下方$\ell$层；
+				若$h<\ell$，则在$\widehat{S}$上方补$\ell-h$层空层，使输出高度为$\ell$。
+				
 				称映射
 				$$
 				\operatorname{Clip}_\ell:\mathbb{S}\to\mathbb{S}
@@ -1506,7 +1874,9 @@
 			\end{definition}
 			
 			完成切割触发破碎后，图形被分成西半边和东半边。
-			两个半边随后分别独立执行一次全局下落，得到切割操作的两个输出。
+			两个半边随后分别作为完整宽度图形独立执行一次全局下落，得到切割操作的两个输出。
+			
+			本文中的半边输出仍保持原图形的高度和宽度，只是另一半被置空。
 			
 			\begin{definition}[切割]
 				设$S\in\mathbb{S}$。
@@ -1658,6 +2028,12 @@
 				\bigr)
 				\Bigr).
 				$$
+				
+				由于$\operatorname{Clip}_\ell$按定义输出高度为$\ell$的图形，而全局下落过程不改变图形高度，
+				故
+				$$
+				\operatorname{ht}(\operatorname{Stack}_\ell(S,T))=\ell.
+				$$
 			\end{definition}
 			
 			结晶操作是带颜色参数的一元机器操作。
@@ -1688,7 +2064,7 @@
 				$$
 				R_S
 				=
-				\{p\in A_S\mid S_p=\mathbf{0}\ \text{或}\ \tau_p=P\}.
+				\{p\in A_S\mid \tau_p=-\ \text{或}\ \tau_p=P\}.
 				$$
 				
 				定义$S$以颜色$\kappa$执行\textbf{结晶}后的图形为
@@ -1802,7 +2178,8 @@
 				$$
 			\end{definition}
 			
-			空间图形只记录类型矩阵，因此它不包含任何颜色信息。
+			空间图形只记录块的类型信息，不记录颜色信息；
+			因此空间块$-$、$P$、$c$以及$\mathbb{T}$中的普通实体类型分别表示空位置、顶针、晶体和普通实体类型。
 			接下来定义从原始图形到空间图形的映射，即把每个块替换为其类型分量。
 			
 			\begin{definition}[空间结构映射]
@@ -1847,7 +2224,18 @@
 				=
 				\{S\in\mathbb{S}\mid \operatorname{Sh}(S)=A\}.
 				$$
+				
+				由于$\mathbb{B}$只包含合法块，若$S\in\operatorname{Real}(A)$，则：
+				\begin{itemize}
+					\item 若$A_p=-$，则必有$S_p=(-,-)$；
+					\item 若$A_p=P$，则必有$S_p=(P,-)$；
+					\item 若$A_p=c$，则$S_p=(c,\chi)$，其中$\chi\in\mathbb{C}$；
+					\item 若$A_p\in\mathbb{T}$，则$S_p=(A_p,\chi)$，其中$\chi\in\mathbb{C}$。
+				\end{itemize}
 			\end{definition}
+			
+			由于本文的块集合$\mathbb{B}$只包含合法块，一个空间图形的有颜色实现并不是任意颜色填充：
+			空类型只能实现为空块，顶针类型只能实现为无颜色顶针，普通实体与晶体类型则需要赋予实际颜色。
 			
 			接下来证明，前文中许多基础结构实际上只依赖空间结构。
 			换言之，只要两个图形具有相同空间结构，那么它们的非空位置、晶体位置、粘连关系、支撑关系以及可下落判断都相同。
@@ -1861,7 +2249,10 @@
 				$$
 				U_S=U_T,\qquad C_S=C_T,
 				$$
-				直接粘连关系、粘连连通关系、最大粘连组划分、支撑关系、支撑图、触地组、受支撑组以及可下落组均相同。
+				直接粘连关系、粘连连通关系、最大粘连组划分、块支撑关系、最大粘连组支撑关系、支撑图、触地组均相同。
+				
+				进一步地，若$\mathcal{P}$是$S$中的一个下落组划分，则它也自然对应为$T$中的一个下落组划分；
+				在同一$\mathcal{P}$下，下落组之间的动态支撑关系以及可下落判断也相同。
 			\end{proposition}
 			
 			\begin{proof}
@@ -1887,10 +2278,24 @@
 			\end{proposition}
 			
 			\begin{proof}
-				由\cref{prop:basic-shape-invariance}，$S$与$T$具有相同的最大粘连组、相同的可下落判断以及相同的下落状态转移结构。
-				一次下落$\Phi_G$只改变块的位置并删除类型为$c$的晶体块，其是否移动或删除只由类型分量决定，与颜色无关。
-				因此，从$S$与$T$出发的下落过程在空间结构层面逐步一致。
-				故终止后得到的图形空间结构相同。
+				由\cref{prop:basic-shape-invariance}，$S$与$T$具有相同的非空位置、晶体位置、初始最大粘连组划分以及相同的可下落判断。
+				因此二者的初始下落组划分在自然对应下相同。
+				
+				在一次下落中，某个下落组$G$中的非晶体块整体下移一层，晶体块被删除；
+				一个位置上的块是否为晶体只由类型分量决定，与颜色无关。
+				因而若在$S$与$T$中对对应下落组执行一次下落，则所得图形仍具有相同空间结构。
+				
+				此外，下落后继组只由下落组非晶体剩余部分的位置以及内部粘连关系决定；
+				这些信息均只依赖空间结构。
+				不重粘连原则本身也不涉及颜色。
+				因此，$S$与$T$的下落状态转移在空间结构层面逐步一致。
+				
+				由全局下落结果的队列顺序无关性，取任意相同队列规则即可得到
+				$$
+				\operatorname{Fall}(S)
+				\equiv_{\mathrm{sh}}
+				\operatorname{Fall}(T).
+				$$
 			\end{proof}
 			
 			晶体破碎同样只取决于晶体所在的位置以及晶体之间的上下左右连通关系。
@@ -1965,7 +2370,8 @@
 			\end{proposition}
 			
 			\begin{proof}
-				由$S\equiv_{\mathrm{sh}}T$可知二者高度、宽度相同，因此
+				由$S\equiv_{\mathrm{sh}}T$可知二者高度、宽度相同，记公共高度与宽度为$h,w$。
+				因此
 				$$
 				I_S=I_T,
 				\qquad
@@ -1979,13 +2385,30 @@
 				$$
 				[p]^c_S=[p]^c_T.
 				$$
-				于是超上限删除触发破碎的晶体位置集合相同：
+				于是超上限区域触发破碎的晶体位置集合相同：
 				$$
 				X_\ell(S)=X_\ell(T).
 				$$
-				因此两者被置空的位置集合相同。由\cref{prop:emptying-shape-invariance}可知，
-				置空后所得图形空间结构相同。
-				最后，$\operatorname{Clip}_\ell$只保留最下方相同数量的层，故最终输出图形仍具有相同空间结构。
+				
+				令
+				$$
+				\widehat S=S\setminus(O_\ell(S)\cup X_\ell(S)),
+				\qquad
+				\widehat T=T\setminus(O_\ell(T)\cup X_\ell(T)).
+				$$
+				由\cref{prop:emptying-shape-invariance}可知
+				$$
+				\widehat S\equiv_{\mathrm{sh}}\widehat T.
+				$$
+				
+				根据$\operatorname{Clip}_\ell$的定义，二者均从对应的$\widehat S,\widehat T$中底部对齐取高度为$\ell$的输出；
+				若$h<\ell$，则二者在上方补相同数量的空层。
+				因此最终输出图形仍具有相同空间结构，即
+				$$
+				\operatorname{Clip}_{\ell}(S)
+				\equiv_{\mathrm{sh}}
+				\operatorname{Clip}_{\ell}(T).
+				$$
 			\end{proof}
 			
 			接下来逐一检查第一章中定义的机器操作。
@@ -2244,9 +2667,7 @@
 			\begin{proof}
 				结晶操作中，需要被替换的位置集合
 				$$
-				R_S
-				=
-				\{p\in A_S\mid S_p=\mathbf{0}\ \text{或}\ \tau_p=P\}
+				R_S=\{p\in A_S\mid \tau_p=-\ \text{或}\ \tau_p=P\}.
 				$$
 				只依赖于$S$的空间结构，与指定颜色无关。
 				对任意$p\in R_S$，无论指定颜色为$\kappa$还是$\lambda$，替换后的块类型均为$c$。
@@ -2344,6 +2765,11 @@
 			这为后续定义空间机器操作和空间可制作性奠定了基础。
 			
 		\subsection{可制作图形与制作路径}
+			
+			上一节说明，所有基础机器操作在空间结构意义下均与颜色无关。
+			为了讨论哪些图形可以由这些机器操作构造出来，本节首先把所有机器操作统一视为有限输入、有限输出的部分映射，并由此定义可制作图形集合。
+			随后，为了在后续章节中进行显式构造，我们引入带标签的制作路径。
+			制作路径不仅记录每一步已经得到的图形，还记录每一步所使用的机器操作、输入标签以及输出标签，因此适合用来形式化描述具体的制作过程。
 						
 			\begin{definition}[机器操作族]
 				一个\textbf{机器操作}是一个有限输入、有限输出的部分映射
@@ -2371,12 +2797,35 @@
 					$$
 					\item 交换：
 					$$
-					\operatorname{Swap}:\operatorname{Dom}(\operatorname{Swap})\subseteq\mathbb{S}^2\to\mathbb{S}^2;
+					\operatorname{Swap}:
+					\operatorname{Dom}(\operatorname{Swap})\subseteq\mathbb{S}^2
+					\longrightarrow
+					\mathbb{S}^2,
+					$$
+					其中
+					$$
+					\operatorname{Dom}(\operatorname{Swap})
+					=
+					\{(S,T)\in\mathbb{S}^2
+					\mid
+					\operatorname{ht}(S)=\operatorname{ht}(T),\ 
+					\operatorname{wd}(S)=\operatorname{wd}(T)\}.
 					$$
 					\item 堆叠：
 					$$
-					\operatorname{Stack}_\ell:\operatorname{Dom}(\operatorname{Stack}_\ell)\subseteq\mathbb{S}^2\to\mathbb{S},
-					\qquad \ell\in\mathbb{N}_{+};
+					\operatorname{Stack}_{\ell}:
+					\operatorname{Dom}(\operatorname{Stack}_{\ell})\subseteq\mathbb{S}^2
+					\longrightarrow
+					\mathbb{S},
+					\qquad \ell\in\mathbb{N}_{+},
+					$$
+					其中
+					$$
+					\operatorname{Dom}(\operatorname{Stack}_\ell)
+					=
+					\{(S,T)\in\mathbb{S}^2
+					\mid
+					\operatorname{wd}(S)=\operatorname{wd}(T)\}.
 					$$
 					\item 结晶：
 					$$
@@ -2390,6 +2839,10 @@
 					$$
 				\end{itemize}
 			\end{definition}
+			
+			有了统一的机器操作族后，可以把“可制作”理解为对这些机器操作封闭的性质。
+			也就是说，只要若干输入图形已经可制作，并且某个机器操作可以作用于这些输入，那么该机器操作产生的所有输出图形也应当视为可制作。
+			下面用最小闭包集合形式化这一直观思想。
 			
 			\begin{definition}[可制作图形]
 				设$\mathcal{I}\subseteq\mathbb{S}$为初始图形集合。
@@ -2423,8 +2876,26 @@
 				若$S\in\operatorname{Make}(\mathcal{I})$，则称$S$是从$\mathcal{I}$出发\textbf{可制作的}。
 			\end{definition}
 			
+			这里的可制作性是非消耗式的：机器操作的输入只要求已经可制作，并不会从可制作集合中移除。
+			因此，同一个已制作图形可以在后续任意多次机器操作中重复使用。
+			这种抽象刻画的是图形是否存在制作方案，而不是具体生产线中的资源消耗数量。
+			
+			在实际构造中，常常会把某些已经可制作的简单图形当作基本组件反复调用。
+			为了避免每次都重新展开这些简单图形的制作过程，下面引入制作单位元的概念。
+			需要注意的是，制作单位元并不一定是地图中直接采集到的原始资源；它可以是相对于某个初始集合已经证明可制作的任意图形。
+			
 			\begin{definition}[制作单位元]
-				对任意实体类型$\tau\in\mathbb{T}$、颜色$\chi\in\mathbb{C}$以及偶数宽度$w$，定义
+				设$\mathcal{I}\subseteq\mathbb{S}$为初始图形集合。
+				若图形$U\in\operatorname{Make}(\mathcal{I})$，则称$U$为相对于$\mathcal{I}$的一个\textbf{制作单位元}。
+				若$\mathcal{U}\subseteq\operatorname{Make}(\mathcal{I})$，则称$\mathcal{U}$为相对于$\mathcal{I}$的一组制作单位元。
+			\end{definition}
+			
+			最基本的一类单位元来自地图采集资源。
+			在本文模型中，地图中直接采集到的基本图形可以抽象为单层图形中仅含一个普通实体块的图形。
+			下面将这类图形称为普通实体单位元。
+			
+			\begin{definition}[普通实体单位元]
+				对任意实体类型$\tau\in\mathbb{T}$、颜色$\chi\in\mathbb{C}$、偶数宽度$w$以及位置$1\leq j\leq w$，定义
 				$$
 				E_{\tau,\chi}^{(w,j)}\in\mathbb{B}^{1\times w}
 				$$
@@ -2439,12 +2910,12 @@
 				\mathbf{0}
 				\quad(j'\neq j)
 				$$
-				的图形，其中$1\leq j\leq w$。
+				的图形。
 				
-				称$E_{\tau,\chi}^{(w,j)}$为一个\textbf{制作单位元}。
-				所有制作单位元构成的集合记为
+				称$E_{\tau,\chi}^{(w,j)}$为一个\textbf{普通实体单位元}。
+				所有普通实体单位元构成的集合记为
 				$$
-				\mathcal{E}
+				\mathcal{E}_{\mathrm{ent}}
 				=
 				\{E_{\tau,\chi}^{(w,j)}
 				\mid
@@ -2452,28 +2923,102 @@
 				$$
 			\end{definition}
 			
+			除了普通实体块外，顶针块在许多构造中也会作为重要的辅助组件出现。
+			顶针没有颜色，因此单层顶针单位元只需记录其所在位置和图形宽度。
+			虽然顶针单位元通常不是直接采集资源，但后文将证明它们可以由普通实体单位元制作得到。
+			
+			\begin{definition}[顶针单位元]
+				对任意偶数宽度$w$以及位置$1\leq j\leq w$，定义
+				$$
+				E_{P}^{(w,j)}\in\mathbb{B}^{1\times w}
+				$$
+				为满足
+				$$
+				\left(E_{P}^{(w,j)}\right)_{(1,j)}
+				=
+				(P,-),
+				\qquad
+				\left(E_{P}^{(w,j)}\right)_{(1,j')}
+				=
+				\mathbf{0}
+				\quad(j'\neq j)
+				$$
+				的图形。
+				
+				称$E_{P}^{(w,j)}$为一个\textbf{顶针单位元}。
+				所有顶针单位元构成的集合记为
+				$$
+				\mathcal{E}_{P}
+				=
+				\{E_{P}^{(w,j)}
+				\mid
+				2\mid w,\ 1\leq j\leq w\}.
+				$$
+			\end{definition}
+			
+			为了简化后续构造，本文将普通实体单位元和顶针单位元合并成一类常用基本组件。
+			在证明顶针单位元的可制作性之后，从普通实体单位元出发和从这组标准单位元出发在可制作性意义下将没有本质差别。
+			
+			\begin{definition}[标准制作单位元]
+				定义
+				$$
+				\mathcal{E}_{\mathrm{std}}
+				=
+				\mathcal{E}_{\mathrm{ent}}\cup\mathcal{E}_{P}
+				$$
+				为\textbf{标准制作单位元集合}。
+				
+				其中$\mathcal{E}_{\mathrm{ent}}$对应地图中可直接采集的单层普通实体块；
+				$\mathcal{E}_{P}$对应单层顶针块，虽然它们通常不是直接采集资源，但后文将证明它们可由普通实体单位元制作。
+				在该可制作性证明之后，$\mathcal{E}_{P}$中的图形便可作为基本组件使用。
+			\end{definition}
+			
+			可制作集合的闭包定义适合描述“哪些图形最终可制作”，但它并不记录具体的制作过程。
+			后续章节中需要显式构造某些图形，因此还需要一种能够记录中间产物、机器操作以及输入输出依赖关系的对象。
+			为此，下面定义带标签的制作路径。
+			标签的作用是区分不同步骤中产生的图形，即使两个图形作为矩阵完全相同，也可以作为不同的中间产物被分别引用。
+			
 			\begin{definition}[制作路径]
 				设$\mathcal{I}\subseteq\mathbb{S}$为初始图形集合。
-				一条从$\mathcal{I}$出发的\textbf{制作路径}是一个有限序列
-				$$
-				\Pi=(\mathcal{S}_0,\mathcal{S}_1,\dots,\mathcal{S}_n),
-				$$
-				其中每个$\mathcal{S}_r\subseteq\mathbb{S}$为有限集合，并满足：
+				一条从$\mathcal{I}$出发的\textbf{制作路径}由以下数据组成：
 				\begin{enumerate}
-					\item
+					\item 一个自然数$n\in\mathbb{N}$；
+					\item 对每个$r=0,\dots,n$，一个有限标签集合$L_r$以及一个映射
 					$$
-					\mathcal{S}_0\subseteq\mathcal{I}.
+					V_r:L_r\to\mathbb{S};
 					$$
-					
-					\item 对每个$r=0,\dots,n-1$，存在机器操作
+					\item 对每个$r=0,\dots,n-1$，一个机器操作
 					$$
 					M_r\in\mathfrak{M},
 					$$
-					以及输入元组
+					一个输入标签元组
 					$$
-					\mathbf{S}_r=(S_{r,1},\dots,S_{r,a(M_r)})\in \mathcal{S}_r^{a(M_r)}
+					\boldsymbol{\lambda}_r
+					=
+					(\lambda_{r,1},\dots,\lambda_{r,a(M_r)})
+					\in L_r^{a(M_r)},
 					$$
-					使得
+					以及互不相同且不属于$L_r$的新输出标签
+					$$
+					\mu_{r,1},\dots,\mu_{r,b(M_r)}.
+					$$
+				\end{enumerate}
+				这些数据要求满足：
+				\begin{enumerate}
+					\item 初始标签对应的图形来自$\mathcal{I}$，即
+					$$
+					V_0(L_0)\subseteq\mathcal{I}.
+					$$
+					
+					\item 对每个$r=0,\dots,n-1$，定义输入图形元组
+					$$
+					\mathbf{S}_r
+					=
+					\bigl(
+					V_r(\lambda_{r,1}),\dots,V_r(\lambda_{r,a(M_r)})
+					\bigr).
+					$$
+					要求
 					$$
 					\mathbf{S}_r\in\operatorname{Dom}(M_r).
 					$$
@@ -2485,16 +3030,32 @@
 					$$
 					则
 					$$
-					\mathcal{S}_{r+1}
+					L_{r+1}
 					=
-					\mathcal{S}_r
-					\cup
-					\{T_{r,1},\dots,T_{r,b(M_r)}\}.
+					L_r\cup\{\mu_{r,1},\dots,\mu_{r,b(M_r)}\},
+					$$
+					并且$V_{r+1}:L_{r+1}\to\mathbb{S}$满足
+					$$
+					V_{r+1}|_{L_r}=V_r,
+					\qquad
+					V_{r+1}(\mu_{r,j})=T_{r,j}
+					\quad(j=1,\dots,b(M_r)).
 					$$
 				\end{enumerate}
 				
-				若$S\in\mathcal{S}_n$，则称制作路径$\Pi$\textbf{制作出}$S$。
+				若存在标签$\lambda\in L_n$使得
+				$$
+				V_n(\lambda)=S,
+				$$
+				则称制作路径\textbf{制作出}$S$。
 			\end{definition}
+			
+			由于输入标签元组属于笛卡尔积$L_r^{a(M_r)}$，同一个标签可以在一个机器操作中被多次选作输入。
+			这与前述非消耗式可制作性一致。
+			此外，标签只用于记录制作过程中的引用关系；两个不同标签可以对应相同的图形。
+			
+			制作路径是闭包式可制作性的过程化展开。
+			下面说明，这两个定义是等价的：一个图形属于最小闭包集合，当且仅当存在一条有限制作路径能够产生它。
 			
 			\begin{proposition}[制作路径刻画可制作性]\label{prop:make-path-characterization}
 				设$\mathcal{I}\subseteq\mathbb{S}$，$S\in\mathbb{S}$。
@@ -2506,49 +3067,83 @@
 			\end{proposition}
 			
 			\begin{proof}
-				由$\operatorname{Make}(\mathcal{I})$作为包含$\mathcal{I}$且对$\mathfrak{M}$中所有机器操作封闭的最小集合的定义可知。
+				记$\mathcal{P}_{\mathcal{I}}$为所有可由从$\mathcal{I}$出发的制作路径制作出的图形集合。
 				
-				具体地，任意制作路径中的每一步都只是在当前集合中加入某个机器操作的输出，
-				因此制作路径所得到的图形均属于$\operatorname{Make}(\mathcal{I})$。
-				反过来，$\operatorname{Make}(\mathcal{I})$中的每个图形都可由有限次应用上述闭包规则得到，
-				这些有限次应用按顺序排列即给出一条制作路径。
+				首先，任意制作路径的初始集合包含于$\mathcal{I}$，且每一步只把某个机器操作作用于已有图形所得的输出加入当前集合。
+				因此，任何包含$\mathcal{I}$并对$\mathfrak{M}$中机器操作封闭的集合都必须包含所有制作路径中出现的图形。
+				特别地，
+				$$
+				\mathcal{P}_{\mathcal{I}}\subseteq\operatorname{Make}(\mathcal{I}).
+				$$
+				
+				反过来，$\mathcal{P}_{\mathcal{I}}$显然包含$\mathcal{I}$。对任意$S\in\mathcal{I}$，取$n=0$、$L_0=\{\lambda\}$且$V_0(\lambda)=S$，即得制作出$S$的制作路径。
+				若$S_1,\dots,S_{a(M)}\in\mathcal{P}_{\mathcal{I}}$且
+				$$
+				M(S_1,\dots,S_{a(M)})=(T_1,\dots,T_{b(M)}),
+				$$
+				则对每个$i$，取一条制作出$S_i$的制作路径。
+				先将这些路径中的标签重命名，使不同路径的标签集合两两不交；
+				再将这些路径依次拼接，得到一条同时包含所有输入$S_i$的制作路径。
+				由于可制作性是非消耗式的，这些输入在拼接后的路径末端均可作为机器$M$的输入被引用。
+				最后追加一步机器操作$M$，并为其输出指定新的标签，即得到制作出$T_1,\dots,T_{b(M)}$的制作路径。
+				因此$\mathcal{P}_{\mathcal{I}}$对所有机器操作封闭。
+				由$\operatorname{Make}(\mathcal{I})$的最小性，
+				$$
+				\operatorname{Make}(\mathcal{I})\subseteq\mathcal{P}_{\mathcal{I}}.
+				$$
+				
+				两个包含关系合起来即得结论。
 			\end{proof}
 			
-			\begin{theorem}[制作路径的颜色无关性]\label{thm:production-path-color-independence}
-				设
-				$$
-				\Pi=(\mathcal{S}_0,\dots,\mathcal{S}_n),
-				\qquad
-				\Pi'=(\mathcal{S}'_0,\dots,\mathcal{S}'_n)
-				$$
-				为两条制作路径。
-				假设二者在第$r$步使用的机器操作分别为$M_r$与$M'_r$，且满足：
+			由于制作路径显式记录了每一步使用的机器操作和输入输出标签，我们可以比较两条具有相同操作骨架的制作路径。
+			若两条路径只在颜色分配以及结晶、上色所选颜色参数上不同，而在空间结构和操作骨架上相同，则机器操作的颜色无关性会逐步传递到整条路径。
+			
+			\begin{theorem}[制作路径输出空间结构的颜色无关性]\label{thm:production-path-color-independence}
+				设$\Pi$与$\Pi'$为两条步骤数均为$n$的制作路径。
+				假设二者具有相同的标签结构和相同的操作骨架，即：
 				\begin{enumerate}
-					\item 初始集合中的对应图形具有相同空间结构；
-					\item 对每个$r=0,\dots,n-1$，$M_r$与$M'_r$除结晶、上色的颜色参数外具有相同的机器类型与相同的非颜色参数；
-					\item 对每个$r=0,\dots,n-1$，两条路径在第$r$步选取的输入图形一一对应，且对应输入图形具有相同空间结构。
+					\item 对每个$r=0,\dots,n$，两条路径具有相同的标签集合，即$L'_r=L_r$；
+					\item 对每个初始标签$\lambda\in L_0$，对应初始图形满足
+					$$
+					V_0(\lambda)\equiv_{\mathrm{sh}}V'_0(\lambda);
+					$$
+					\item 对每个$r=0,\dots,n-1$，二者第$r$步使用的机器操作除结晶、上色的颜色参数外具有相同的机器类型与相同的非颜色参数；
+					\item 对每个$r=0,\dots,n-1$，二者第$r$步使用相同的输入标签元组，并且第$j$个输出使用相同的输出标签。
 				\end{enumerate}
-				则对每个$r=0,\dots,n$，$\mathcal{S}_r$与$\mathcal{S}'_r$中的对应图形具有相同空间结构。
-				特别地，若$S$与$S'$为两条路径对应的最终输出，则
+				则对任意$r=0,\dots,n$及任意$\lambda\in L_r$，都有
 				$$
-				S\equiv_{\mathrm{sh}}S'.
+				V_r(\lambda)\equiv_{\mathrm{sh}}V'_r(\lambda).
 				$$
 			\end{theorem}
 			
 			\begin{proof}
+				
 				对$r$作归纳。
-				当$r=0$时，结论由假设成立。
+				当$r=0$时，结论由初始标签上的假设成立。
 				
-				假设第$r$步时对应图形具有相同空间结构。
-				两条路径在第$r$步选取的输入图形一一对应，且对应输入图形具有相同空间结构。
-				由\cref{thm:machine-shape-invariance}，对应机器操作的输出图形也具有相同空间结构。
-				因此将这些输出并入当前集合后，第$r+1$步的对应图形仍具有相同空间结构。
+				假设结论对$r$成立。
+				第$r$步中，两条路径使用相同的输入标签元组，因此对应输入图形逐项具有相同空间结构。
+				又二者使用的机器操作除颜色参数外具有相同机器类型与相同非颜色参数。
+				由\cref{thm:machine-shape-invariance}，对应输出图形逐项具有相同空间结构。
 				
-				由归纳法，结论对所有$r=0,\dots,n$成立。
+				旧标签上的图形保持不变，新输出标签上的图形也逐项空间结构相同。
+				因此结论对$r+1$成立。
+				
+				由归纳法，结论成立。
 			\end{proof}
 			
-			\begin{corollary}[可制作空间结构的颜色无关性]\label{cor:make-shape-color-independence}
-				设两组初始图形集合$\mathcal{I},\mathcal{I}'\subseteq\mathbb{S}$在空间结构上一一对应。
+			上述定理说明，一条制作路径的输出空间结构只依赖于初始图形的空间结构以及机器操作的非颜色部分。
+			特别地，若把制作过程中结晶和上色所使用的颜色参数任意替换，只要保留相同的操作骨架，最终得到的图形仍具有相同空间结构。
+			
+			\begin{corollary}[颜色参数不影响空间可制作性]\label{cor:make-shape-color-independence}
+				设存在双射
+				$$
+				\rho:\mathcal{I}_0\to\mathcal{I}'_0
+				$$
+				其中$\mathcal{I}_0\subseteq\mathcal{I}$、$\mathcal{I}'_0\subseteq\mathcal{I}'$，并且对任意$S\in\mathcal{I}_0$有
+				$$
+				S\equiv_{\mathrm{sh}}\rho(S).
+				$$
 				若$S\in\operatorname{Make}(\mathcal{I})$，则存在
 				$$
 				S'\in\operatorname{Make}(\mathcal{I}')
@@ -2562,8 +3157,8 @@
 			
 			\begin{proof}
 				由\cref{prop:make-path-characterization}，存在一条从$\mathcal{I}$制作出$S$的制作路径。
-				在$\mathcal{I}'$中选取空间结构对应的初始图形，并使用相同操作骨架构造制作路径，
-				其中结晶和上色的颜色参数任意指定。
+				按照$\mathcal{I}$与$\mathcal{I}'$之间给定的空间结构对应关系，为原制作路径中的每个初始标签选择$\mathcal{I}'$中对应的初始图形。
+				然后使用相同的标签结构和相同的操作骨架构造一条新的制作路径，其中结晶和上色的颜色参数任意指定。
 				由\cref{thm:production-path-color-independence}，最终得到的图形$S'$满足
 				$$
 				S\equiv_{\mathrm{sh}}S'.
