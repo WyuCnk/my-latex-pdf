@@ -1017,7 +1017,7 @@
 				=
 				\operatorname{Fall}_{\omega_2}(S).
 				$$
-				也就是说，全局下落结果与最大粘连组的入队顺序无关。
+				也就是说，全局下落结果与下落组的入队顺序无关。
 			\end{proposition}
 			
 			\begin{proof}
@@ -1028,6 +1028,11 @@
 				在该轮次中，真正发生的一次下落总是选取当前图形中某个可以下落一层的下落组。
 				由\cref{prop:fallable-preservation}，若两个不同下落组在同一状态下均可以下落，则先下落其中一个不会使另一个变为不可下落。
 				由\cref{prop:fall-commutation}，这两个一次下落操作的执行顺序可以交换，且交换后得到的图形相同。
+				
+				因此，在任意有限下落序列中，若相邻两次实际下落操作的执行对象在同一状态下均可下落，则可以交换它们而不改变最终图形。
+				反复应用该交换律，可以将由队列规则$\omega_1$产生的实际下落序列重排为由队列规则$\omega_2$产生的实际下落序列，而终止图形保持不变。
+				
+				由于每次实际下落的后继组只由该下落组自身决定，并且不会与外部下落组重新粘连，故交换两个同时可下落的下落操作不仅不改变当前图形，也不改变后续可检查的下落组集合。
 				
 				因此，在任意有限下落序列中，若相邻两次实际下落操作的执行对象在同一状态下均可下落，则可以交换它们而不改变最终图形。
 				反复应用该交换律，可以将由队列规则$\omega_1$产生的实际下落序列重排为由队列规则$\omega_2$产生的实际下落序列，而终止图形保持不变。
@@ -1218,7 +1223,6 @@
 			\mathcal{L}_n\subseteq\mathcal{L}_{n+1}.
 			$$
 			由于$\mathcal{G}(S)$有限，二者均在有限步后稳定。
-			又由于$\mathcal{G}(S)$有限，二者均在有限步后稳定。
 			
 			在没有循环支撑结构的情况下，支撑图是有向无环图。
 			此时不可下落性只能从触地组向上传播，不会凭空由循环支撑产生。
@@ -1427,43 +1431,43 @@
 			\begin{proof}
 				记全局下落过程中始终不发生第一次下落的初始最大粘连组集合为$\mathcal{X}$。
 				
-				首先，任意触地组都不可能下落，因此
+				首先证明
 				$$
-				\mathcal{B}_S\subseteq\mathcal{X}.
+				\nu\Theta_S\subseteq\mathcal{X}.
 				$$
-				若$G\in\mathcal{X}$且$G\to_S H$，则在初始状态中$H$受到$G$的支撑。
-				由于$G$始终不发生下落，并且全局下落过程不产生外部重粘连，$G$对$H$的阻挡不会因其他下落组的运动而消失。
-				因此$H$也不可能先于$G$发生下落，从而$H\in\mathcal{X}$。
-				故
-				$$
-				\Theta_S(\mathcal{X})\subseteq\mathcal{X}.
-				$$
-				又由$\mathcal{B}_S\subseteq\mathcal{X}$以及上述支撑闭包性，实际上有
-				$$
-				\Theta_S(\mathcal{X})=\mathcal{X}.
-				$$
-				因此$\mathcal{X}$是$\Theta_S$的不动点。
-				于是
-				$$
-				\mathcal{X}\subseteq\nu\Theta_S.
-				$$
+				由最大不动点的循环刻画，$\nu\Theta_S$由触地组、循环支撑核以及它们沿初始支撑关系向上可达的组组成。
 				
-				反过来，设$G\in\nu\Theta_S$。
-				由于$\nu\Theta_S$是不动点，若$G$不是触地组，则存在$H\in\nu\Theta_S$使得
-				$$
-				H\to_S G.
-				$$
-				因而$\nu\Theta_S$中的每个非触地组都受到同在$\nu\Theta_S$中的某个组支撑。
-				由最大不动点的循环刻画，$\nu\Theta_S$由触地组、循环支撑核以及它们沿支撑关系向上可达的组组成。
+				触地组由于已经到达图形底部，不可能发生下落。
+				对于循环支撑结构，若其中存在第一个发生下落的组，则在它下落之前，循环中直接支撑它的前一个组尚未下落，因此它仍受支撑，矛盾。
+				故循环支撑结构中的组均不会发生第一次下落。
 				
-				触地组不能下落；
-				循环支撑结构中的组相互支撑，因而没有任何一个组能够首先下落；
-				而由这些组向上支撑到的组始终受到下方不下落组的阻挡。
-				根据下落过程的不重粘连原则，其他下落组的运动不会破坏这些初始支撑依赖。
-				因此$\nu\Theta_S$中的初始最大粘连组均不会发生第一次下落。
+				又若某个组受到已经不会下落的组支撑，则由于下落过程不产生外部重粘连，且该支撑组始终保持原位，这一支撑阻挡不会因其他下落组的运动而消失。
+				因此由触地组或循环支撑结构沿支撑关系向上可达的组也不会发生第一次下落。
 				于是
 				$$
 				\nu\Theta_S\subseteq\mathcal{X}.
+				$$
+				
+				反过来证明
+				$$
+				\mathcal{X}\subseteq\nu\Theta_S.
+				$$
+				取任意
+				$$
+				G\in\mathcal{G}(S)\setminus\nu\Theta_S.
+				$$
+				由最大不动点的循环刻画，$G$不在任何触地组或循环支撑核的向上支撑闭包中。
+				因而在只考虑$\mathcal{G}(S)\setminus\nu\Theta_S$所诱导的支撑依赖时，从$G$向下追溯其支撑来源，不可能到达触地组，也不可能进入循环。
+				由于$\mathcal{G}(S)$有限，该追溯过程必然终止于某个非触地且不受支撑的初始最大粘连组$G_0$。
+				
+				由\cref{prop:fallable-characterization}，$G_0$在初始状态中可以下落一层。
+				当$G_0$发生下落后，根据下落过程的不重粘连原则以及\cref{prop:no-new-external-support}，不会产生新的外部支撑来阻止原本依赖于$G_0$的上方组。
+				因此沿着从$G_0$到$G$的支撑路径，支撑阻挡会依次解除；由终止性和队列顺序无关性，这些解除不依赖具体队列顺序。
+				于是$G$最终也会发生第一次下落。
+				
+				因而任何不属于$\nu\Theta_S$的初始最大粘连组都不属于$\mathcal{X}$，即
+				$$
+				\mathcal{X}\subseteq\nu\Theta_S.
 				$$
 				
 				综上，
@@ -1512,10 +1516,6 @@
 				$$
 				\operatorname{Fall}_{\mathrm{st}}(S).
 				$$
-				所得图形记为
-				$$
-				\operatorname{Fall}_{\mathrm{st}}(S).
-				$$
 				等价地，静态下落过程将$\mathcal{F}(S)$中的每个初始组视为已经发生第一次下落：其中晶体被删除，非晶体部分进入后续下落过程。
 			\end{definition}
 			
@@ -1536,50 +1536,31 @@
 			\end{theorem}
 			
 			\begin{proof}
-				记全局下落过程中始终不发生第一次下落的初始最大粘连组集合为$\mathcal{X}$。
-				
-				首先证明
+				由\cref{prop:nonfalling-fixed-point}，队列式全局下落过程中不会发生第一次下落的初始最大粘连组恰为
 				$$
-				\nu\Theta_S\subseteq\mathcal{X}.
+				\mathcal{N}(S)=\nu\Theta_S.
 				$$
-				由最大不动点的循环刻画，$\nu\Theta_S$由触地组、循环支撑核以及它们沿初始支撑关系向上可达的组组成。
+				因此这些组中的块在队列式下落和静态下落中均保持不动。
 				
-				触地组由于已经到达图形底部，不可能发生下落。
-				对于循环支撑结构，若其中存在第一个发生下落的组，则在它下落之前，循环中直接支撑它的前一个组尚未下落，因此它仍受支撑，矛盾。
-				故循环支撑结构中的组均不会发生第一次下落。
-				
-				又若某个组受到已经不会下落的组支撑，则由于下落过程不产生外部重粘连，且该支撑组始终保持原位，这一支撑阻挡不会因其他下落组的运动而消失。
-				因此由触地组或循环支撑结构沿支撑关系向上可达的组也不会发生第一次下落。
-				于是
+				对补集
 				$$
-				\nu\Theta_S\subseteq\mathcal{X}.
+				\mathcal{F}(S)=\mathcal{G}(S)\setminus\mathcal{N}(S)
+				$$
+				中的初始最大粘连组，它们都会在队列式下落过程中发生第一次下落。
+				根据一次下落定义，它们在第一次下落时，其中的晶体块被删除，非晶体块进入后续下落过程。
+				因而被删除的初始晶体位置正是
+				$$
+				C_{\mathrm{fall}}(S)=P_{\mathrm{fall}}(S)\cap C_S.
 				$$
 				
-				反过来证明
+				删除这些晶体后，剩余可动部分按照同一不重粘连规则继续下落。
+				由队列顺序无关性，该剩余过程的终止图形与具体处理顺序无关。
+				因此可以用静态下落过程所规定的顺序处理，所得结果与队列式全局下落相同。
+				故
 				$$
-				\mathcal{X}\subseteq\nu\Theta_S.
-				$$
-				取任意
-				$$
-				G\in\mathcal{G}(S)\setminus\nu\Theta_S.
-				$$
-				由最大不动点的循环刻画，$G$不在任何触地组或循环支撑核的向上支撑闭包中。
-				因而在只考虑$\mathcal{G}(S)\setminus\nu\Theta_S$所诱导的支撑依赖时，从$G$向下追溯其支撑来源，不可能到达触地组，也不可能进入循环。
-				由于$\mathcal{G}(S)$有限，该追溯过程必然终止于某个非触地且不受支撑的初始最大粘连组$G_0$。
-				
-				由\cref{prop:fallable-characterization}，$G_0$在初始状态中可以下落一层。
-				当$G_0$发生下落后，根据下落过程的不重粘连原则以及\cref{prop:no-new-external-support}，不会产生新的外部支撑来阻止原本依赖于$G_0$的上方组。
-				因此沿着从$G_0$到$G$的支撑路径，支撑阻挡会依次解除；由终止性和队列顺序无关性，这些解除不依赖具体队列顺序。
-				于是$G$最终也会发生第一次下落。
-				
-				因而任何不属于$\nu\Theta_S$的初始最大粘连组都不属于$\mathcal{X}$，即
-				$$
-				\mathcal{X}\subseteq\nu\Theta_S.
-				$$
-				
-				综上，
-				$$
-				\mathcal{X}=\nu\Theta_S.
+				\operatorname{Fall}_{\mathrm{st}}(S)
+				=
+				\operatorname{Fall}(S).
 				$$
 			\end{proof}
 			
@@ -3136,11 +3117,11 @@
 			特别地，若把制作过程中结晶和上色所使用的颜色参数任意替换，只要保留相同的操作骨架，最终得到的图形仍具有相同空间结构。
 			
 			\begin{corollary}[颜色参数不影响空间可制作性]\label{cor:make-shape-color-independence}
-				设存在双射
+				设$\mathcal{I},\mathcal{I}'\subseteq\mathbb{S}$，并假设存在映射
 				$$
-				\rho:\mathcal{I}_0\to\mathcal{I}'_0
+				\rho:\mathcal{I}\to\mathcal{I}'
 				$$
-				其中$\mathcal{I}_0\subseteq\mathcal{I}$、$\mathcal{I}'_0\subseteq\mathcal{I}'$，并且对任意$S\in\mathcal{I}_0$有
+				使得对任意$S\in\mathcal{I}$都有
 				$$
 				S\equiv_{\mathrm{sh}}\rho(S).
 				$$
@@ -3167,452 +3148,10 @@
 			
 		\subsection{空间可制作性}
 			
-			\begin{definition}[空间机器操作]
-				设
-				$$
-				M:\operatorname{Dom}(M)\subseteq \mathbb{S}^{a(M)}
-				\to
-				\mathbb{S}^{b(M)}
-				$$
-				为一个机器操作。
-				若存在映射
-				$$
-				M^{\mathrm{sh}}:
-				\operatorname{Dom}(M^{\mathrm{sh}})
-				\subseteq
-				\mathbb{S}_{\mathrm{sh}}^{a(M)}
-				\to
-				\mathbb{S}_{\mathrm{sh}}^{b(M)}
-				$$
-				使得对任意
-				$$
-				(S_1,\dots,S_{a(M)})\in\operatorname{Dom}(M),
-				$$
-				若
-				$$
-				M(S_1,\dots,S_{a(M)})
-				=
-				(T_1,\dots,T_{b(M)}),
-				$$
-				则
-				$$
-				M^{\mathrm{sh}}
-				\bigl(
-				\operatorname{Sh}(S_1),\dots,\operatorname{Sh}(S_{a(M)})
-				\bigr)
-				=
-				\bigl(
-				\operatorname{Sh}(T_1),\dots,\operatorname{Sh}(T_{b(M)})
-				\bigr),
-				$$
-				则称$M^{\mathrm{sh}}$为$M$诱导的\textbf{空间机器操作}。
-				
-				若$M^{\mathrm{sh}}$由$M$诱导，则约定
-				$$
-				a(M^{\mathrm{sh}})=a(M),
-				\qquad
-				b(M^{\mathrm{sh}})=b(M).
-				$$
-			\end{definition}
-			
-			\begin{proposition}[空间机器操作的良定义性]\label{prop:shape-machine-well-defined}
-				每个已定义的机器操作$M\in\mathfrak{M}$都诱导唯一的空间机器操作$M^{\mathrm{sh}}$。
-			\end{proposition}
-			
-			\begin{proof}
-				由\cref{thm:machine-shape-invariance}，若两组输入图形具有相同空间结构，则对应输出图形也具有相同空间结构。
-				因此输出空间结构只依赖输入空间结构，而与所选有颜色实现无关。
-				故$M^{\mathrm{sh}}$良定义且唯一。
-			\end{proof}
-			
-			\begin{definition}[空间机器操作族]
-				定义
-				$$
-				\mathfrak{M}_{\mathrm{sh}}
-				=
-				\{M^{\mathrm{sh}}\mid M\in\mathfrak{M}\}
-				$$
-				为由$\mathfrak{M}$诱导的\textbf{空间机器操作族}。
-			\end{definition}
-			
-			\begin{proposition}[结晶与上色的空间机器操作]
-				对任意$\kappa,\lambda\in\mathbb{C}$，
-				$$
-				(\operatorname{Cry}_{\kappa})^{\mathrm{sh}}
-				=
-				(\operatorname{Cry}_{\lambda})^{\mathrm{sh}}.
-				$$
-				因此可记为$\operatorname{Cry}^{\mathrm{sh}}$。
-				此外，
-				$$
-				(\operatorname{Paint}_{\kappa})^{\mathrm{sh}}
-				=
-				\operatorname{id}_{\mathbb{S}_{\mathrm{sh}}}.
-				$$
-			\end{proposition}
-			
-			\begin{definition}[空间可制作图形]
-				设$\mathcal{A}\subseteq\mathbb{S}_{\mathrm{sh}}$为初始空间图形集合。
-				定义由$\mathcal{A}$生成的\textbf{空间可制作图形集合}
-				$$
-				\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})
-				$$
-				为满足以下条件的最小子集$\mathcal{M}\subseteq\mathbb{S}_{\mathrm{sh}}$：
-				\begin{enumerate}
-					\item
-					$$
-					\mathcal{A}\subseteq\mathcal{M};
-					$$
-					
-					\item 对任意$M^{\mathrm{sh}}\in\mathfrak{M}_{\mathrm{sh}}$，若
-					$$
-					(A_1,\dots,A_{a(M)})
-					\in
-					\operatorname{Dom}(M^{\mathrm{sh}})\cap\mathcal{M}^{a(M)}
-					$$
-					且
-					$$
-					M^{\mathrm{sh}}(A_1,\dots,A_{a(M)})
-					=
-					(B_1,\dots,B_{b(M)}),
-					$$
-					则
-					$$
-					B_1,\dots,B_{b(M)}\in\mathcal{M}.
-					$$
-				\end{enumerate}
-				
-				若$A\in\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})$，则称$A$从$\mathcal{A}$出发\textbf{空间可制作}。
-			\end{definition}
-			
-			\begin{definition}[空间制作路径]
-				设$\mathcal{A}\subseteq\mathbb{S}_{\mathrm{sh}}$为初始空间图形集合。
-				一条从$\mathcal{A}$出发的\textbf{空间制作路径}是一个有限序列
-				$$
-				\Pi_{\mathrm{sh}}
-				=
-				(\mathcal{A}_0,\mathcal{A}_1,\dots,\mathcal{A}_n),
-				$$
-				其中每个$\mathcal{A}_r\subseteq\mathbb{S}_{\mathrm{sh}}$为有限集合，并满足：
-				\begin{enumerate}
-					\item
-					$$
-					\mathcal{A}_0\subseteq\mathcal{A}.
-					$$
-					
-					\item 对每个$r=0,\dots,n-1$，存在空间机器操作
-					$$
-					M_r^{\mathrm{sh}}\in\mathfrak{M}_{\mathrm{sh}},
-					$$
-					以及输入元组
-					$$
-					\mathbf{A}_r
-					=
-					(A_{r,1},\dots,A_{r,a(M_r^{\mathrm{sh}})})
-					\in
-					\mathcal{A}_r^{a(M_r^{\mathrm{sh}})}
-					$$
-					使得
-					$$
-					\mathbf{A}_r\in\operatorname{Dom}(M_r^{\mathrm{sh}}).
-					$$
-					若
-					$$
-					M_r^{\mathrm{sh}}(\mathbf{A}_r)
-					=
-					(B_{r,1},\dots,B_{r,b(M_r^{\mathrm{sh}})}),
-					$$
-					则
-					$$
-					\mathcal{A}_{r+1}
-					=
-					\mathcal{A}_r
-					\cup
-					\{B_{r,1},\dots,B_{r,b(M_r^{\mathrm{sh}})}\}.
-					$$
-				\end{enumerate}
-				
-				若$A\in\mathcal{A}_n$，则称空间制作路径$\Pi_{\mathrm{sh}}$\textbf{制作出}$A$。
-			\end{definition}
-			
-			\begin{proposition}[空间制作路径刻画空间可制作性]\label{prop:shape-make-path-characterization}
-				设$\mathcal{A}\subseteq\mathbb{S}_{\mathrm{sh}}$，$A\in\mathbb{S}_{\mathrm{sh}}$。
-				则
-				$$
-				A\in\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})
-				$$
-				当且仅当存在一条从$\mathcal{A}$出发并制作出$A$的空间制作路径。
-			\end{proposition}
-			
-			\begin{proof}
-				由$\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})$作为包含$\mathcal{A}$且对$\mathfrak{M}_{\mathrm{sh}}$中所有空间机器操作封闭的最小集合的定义可知。
-				
-				具体地，任意空间制作路径中的每一步都只是在当前集合中加入某个空间机器操作的输出，
-				因此空间制作路径所得到的空间图形均属于$\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})$。
-				
-				反过来，$\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})$中的每个空间图形都可由有限次应用上述闭包规则得到，
-				这些有限次应用按顺序排列即给出一条空间制作路径。
-			\end{proof}
-			
-			\begin{proposition}[可制作性的空间投影]\label{prop:make-shape-projection}
-				设$\mathcal{I}\subseteq\mathbb{S}$，并记
-				$$
-				\operatorname{Sh}(\mathcal{I})
-				=
-				\{\operatorname{Sh}(S)\mid S\in\mathcal{I}\}.
-				$$
-				若
-				$$
-				S\in\operatorname{Make}(\mathcal{I}),
-				$$
-				则
-				$$
-				\operatorname{Sh}(S)
-				\in
-				\operatorname{Make}_{\mathrm{sh}}(\operatorname{Sh}(\mathcal{I})).
-				$$
-			\end{proposition}
-			
-			\begin{proof}
-				由\cref{prop:make-path-characterization}，存在一条从$\mathcal{I}$出发并制作出$S$的制作路径
-				$$
-				\Pi=(\mathcal{S}_0,\mathcal{S}_1,\dots,\mathcal{S}_n).
-				$$
-				
-				对每个$r=0,\dots,n$，定义
-				$$
-				\mathcal{A}_r
-				=
-				\operatorname{Sh}(\mathcal{S}_r)
-				=
-				\{\operatorname{Sh}(T)\mid T\in\mathcal{S}_r\}.
-				$$
-				由于$\mathcal{S}_0\subseteq\mathcal{I}$，有
-				$$
-				\mathcal{A}_0\subseteq\operatorname{Sh}(\mathcal{I}).
-				$$
-				
-				对每个$r=0,\dots,n-1$，由制作路径定义，存在机器操作
-				$$
-				M_r\in\mathfrak{M}
-				$$
-				以及输入元组
-				$$
-				\mathbf{S}_r
-				=
-				(S_{r,1},\dots,S_{r,a(M_r)})
-				\in \mathcal{S}_r^{a(M_r)}
-				$$
-				使得
-				$$
-				\mathbf{S}_r\in\operatorname{Dom}(M_r).
-				$$
-				若
-				$$
-				M_r(\mathbf{S}_r)
-				=
-				(T_{r,1},\dots,T_{r,b(M_r)}),
-				$$
-				则
-				$$
-				\mathcal{S}_{r+1}
-				=
-				\mathcal{S}_r
-				\cup
-				\{T_{r,1},\dots,T_{r,b(M_r)}\}.
-				$$
-				
-				由空间机器操作的定义，
-				$$
-				M_r^{\mathrm{sh}}
-				\bigl(
-				\operatorname{Sh}(S_{r,1}),\dots,\operatorname{Sh}(S_{r,a(M_r)})
-				\bigr)
-				=
-				\bigl(
-				\operatorname{Sh}(T_{r,1}),\dots,\operatorname{Sh}(T_{r,b(M_r)})
-				\bigr).
-				$$
-				因此
-				$$
-				\mathcal{A}_{r+1}
-				=
-				\mathcal{A}_r
-				\cup
-				\{
-				\operatorname{Sh}(T_{r,1}),\dots,\operatorname{Sh}(T_{r,b(M_r)})
-				\}
-				$$
-				由$\mathcal{A}_r$经过一次空间机器操作得到。
-				
-				于是
-				$$
-				\Pi_{\mathrm{sh}}
-				=
-				(\mathcal{A}_0,\mathcal{A}_1,\dots,\mathcal{A}_n)
-				$$
-				是一条从$\operatorname{Sh}(\mathcal{I})$出发的空间制作路径。
-				由于$S\in\mathcal{S}_n$，有
-				$$
-				\operatorname{Sh}(S)\in\mathcal{A}_n.
-				$$
-				由\cref{prop:shape-make-path-characterization}，
-				$$
-				\operatorname{Sh}(S)
-				\in
-				\operatorname{Make}_{\mathrm{sh}}(\operatorname{Sh}(\mathcal{I})).
-				$$
-			\end{proof}
-			
-			\begin{proposition}[空间制作的有颜色实现]\label{prop:shape-make-realization}
-				设$\mathcal{A}\subseteq\mathbb{S}_{\mathrm{sh}}$。
-				对每个$A\in\mathcal{A}$，任取一个有颜色实现$S_A\in\operatorname{Real}(A)$，
-				并令
-				$$
-				\mathcal{I}
-				=
-				\{S_A\mid A\in\mathcal{A}\}.
-				$$
-				若
-				$$
-				B\in\operatorname{Make}_{\mathrm{sh}}(\mathcal{A}),
-				$$
-				则存在
-				$$
-				T\in\operatorname{Make}(\mathcal{I})
-				$$
-				使得
-				$$
-				\operatorname{Sh}(T)=B.
-				$$
-			\end{proposition}
-			
-			\begin{proof}
-				由\cref{prop:shape-make-path-characterization}，存在一条从$\mathcal{A}$出发并制作出$B$的空间制作路径
-				$$
-				\Pi_{\mathrm{sh}}
-				=
-				(\mathcal{A}_0,\mathcal{A}_1,\dots,\mathcal{A}_n).
-				$$
-				
-				我们对$r=0,\dots,n$构造有限集合
-				$$
-				\mathcal{S}_r\subseteq\operatorname{Make}(\mathcal{I})
-				$$
-				使得
-				$$
-				\operatorname{Sh}(\mathcal{S}_r)=\mathcal{A}_r.
-				$$
-				
-				当$r=0$时，由$\mathcal{A}_0\subseteq\mathcal{A}$，且每个$A\in\mathcal{A}$都有选定实现$S_A\in\mathcal{I}$，令
-				$$
-				\mathcal{S}_0
-				=
-				\{S_A\mid A\in\mathcal{A}_0\}.
-				$$
-				则
-				$$
-				\mathcal{S}_0\subseteq\mathcal{I}\subseteq\operatorname{Make}(\mathcal{I}),
-				\qquad
-				\operatorname{Sh}(\mathcal{S}_0)=\mathcal{A}_0.
-				$$
-				
-				假设已经构造了$\mathcal{S}_r$，且
-				$$
-				\operatorname{Sh}(\mathcal{S}_r)=\mathcal{A}_r.
-				$$
-				由空间制作路径定义，存在
-				$$
-				M_r^{\mathrm{sh}}\in\mathfrak{M}_{\mathrm{sh}}
-				$$
-				和输入元组
-				$$
-				(A_{r,1},\dots,A_{r,a(M_r^{\mathrm{sh}})})
-				\in
-				\mathcal{A}_r^{a(M_r^{\mathrm{sh}})}
-				$$
-				使得该输入元组属于$\operatorname{Dom}(M_r^{\mathrm{sh}})$。
-				设
-				$$
-				M_r^{\mathrm{sh}}(A_{r,1},\dots,A_{r,a(M_r^{\mathrm{sh}})})
-				=
-				(B_{r,1},\dots,B_{r,b(M_r^{\mathrm{sh}})}).
-				$$
-				
-				由于$\operatorname{Sh}(\mathcal{S}_r)=\mathcal{A}_r$，对每个$i$，可取
-				$$
-				S_{r,i}\in\mathcal{S}_r
-				$$
-				使得
-				$$
-				\operatorname{Sh}(S_{r,i})=A_{r,i}.
-				$$
-				设$M_r\in\mathfrak{M}$为诱导$M_r^{\mathrm{sh}}$的有颜色机器操作。
-				
-				由于本文所有机器操作的定义域条件只依赖空间结构，且
-				$$
-				(A_{r,1},\dots,A_{r,a(M_r^{\mathrm{sh}})})
-				\in
-				\operatorname{Dom}(M_r^{\mathrm{sh}}),
-				$$
-				故
-				$$
-				(S_{r,1},\dots,S_{r,a(M_r)})
-				\in
-				\operatorname{Dom}(M_r).
-				$$
-				令
-				$$
-				M_r(S_{r,1},\dots,S_{r,a(M_r)})
-				=
-				(T_{r,1},\dots,T_{r,b(M_r)}).
-				$$
-				由$\mathcal{S}_r\subseteq\operatorname{Make}(\mathcal{I})$以及$\operatorname{Make}(\mathcal{I})$对机器操作封闭，
-				有
-				$$
-				T_{r,1},\dots,T_{r,b(M_r)}
-				\in
-				\operatorname{Make}(\mathcal{I}).
-				$$
-				并且由空间机器操作定义，
-				$$
-				\operatorname{Sh}(T_{r,j})=B_{r,j},
-				\qquad j=1,\dots,b(M_r).
-				$$
-				
-				令
-				$$
-				\mathcal{S}_{r+1}
-				=
-				\mathcal{S}_r
-				\cup
-				\{T_{r,1},\dots,T_{r,b(M_r)}\}.
-				$$
-				则
-				$$
-				\mathcal{S}_{r+1}\subseteq\operatorname{Make}(\mathcal{I}),
-				\qquad
-				\operatorname{Sh}(\mathcal{S}_{r+1})=\mathcal{A}_{r+1}.
-				$$
-				
-				由归纳法，存在$\mathcal{S}_n\subseteq\operatorname{Make}(\mathcal{I})$满足
-				$$
-				\operatorname{Sh}(\mathcal{S}_n)=\mathcal{A}_n.
-				$$
-				由于$B\in\mathcal{A}_n$，故存在
-				$$
-				T\in\mathcal{S}_n
-				$$
-				使得
-				$$
-				\operatorname{Sh}(T)=B.
-				$$
-				又$\mathcal{S}_n\subseteq\operatorname{Make}(\mathcal{I})$，因此
-				$$
-				T\in\operatorname{Make}(\mathcal{I}).
-				$$
-				结论成立。
-			\end{proof}
+			上一节从有颜色图形出发定义了可制作图形与制作路径。
+			由于所有机器操作在空间结构意义下与颜色无关，每个有颜色机器操作都应当诱导一个只作用于空间图形的机器操作。
+			本节将这一思想形式化，并在空间图形层面定义空间可制作性。
+			随后证明，有颜色可制作性经过空间结构映射$\operatorname{Sh}$投影后，恰好等于空间机器系统中的可制作性。
 			
 			\begin{definition}[空间相容定义域]
 				称机器操作$M\in\mathfrak{M}$具有\textbf{空间相容定义域}，如果对任意两组输入
@@ -3645,6 +3184,669 @@
 				这些条件均只依赖输入图形的空间结构。
 				因此所有已定义机器操作均具有空间相容定义域。
 			\end{proof}
+			
+			空间相容定义域保证了一个空间输入是否可以进入机器，只由其空间结构决定。
+			因此，可以先把有色机器的定义域投影到空间图形上，再用任意有颜色实现计算输出空间结构。
+			机器操作颜色无关性将保证这种定义不依赖于所选实现。
+			
+			\begin{definition}[空间机器操作]
+				设
+				$$
+				M:\operatorname{Dom}(M)\subseteq\mathbb{S}^{a(M)}
+				\longrightarrow
+				\mathbb{S}^{b(M)}
+				$$
+				为一个机器操作。
+				定义$M$的\textbf{空间定义域}为
+				$$
+				\operatorname{Dom}(M^{\mathrm{sh}})
+				=
+				\left\{
+				\bigl(\operatorname{Sh}(S_1),\dots,\operatorname{Sh}(S_{a(M)})\bigr)
+				\ \middle|\
+				(S_1,\dots,S_{a(M)})\in\operatorname{Dom}(M)
+				\right\}.
+				$$
+				
+				由于本文所有机器操作均具有空间相容定义域，若
+				$$
+				(A_1,\dots,A_{a(M)})\in\operatorname{Dom}(M^{\mathrm{sh}}),
+				$$
+				则任意选择有颜色实现
+				$$
+				S_i\in\operatorname{Real}(A_i)
+				\qquad(i=1,\dots,a(M))
+				$$
+				时，都有
+				$$
+				(S_1,\dots,S_{a(M)})\in\operatorname{Dom}(M).
+				$$
+				若
+				$$
+				M(S_1,\dots,S_{a(M)})
+				=
+				(T_1,\dots,T_{b(M)}),
+				$$
+				则定义
+				$$
+				M^{\mathrm{sh}}(A_1,\dots,A_{a(M)})
+				=
+				(\operatorname{Sh}(T_1),\dots,\operatorname{Sh}(T_{b(M)})).
+				$$
+				若该输出与所选有颜色实现无关，则称$M^{\mathrm{sh}}$为$M$诱导的空间机器操作。
+				
+				约定
+				$$
+				a(M^{\mathrm{sh}})=a(M),
+				\qquad
+				b(M^{\mathrm{sh}})=b(M).
+				$$
+			\end{definition}
+			
+			\begin{proposition}[空间机器操作的良定义性]\label{prop:shape-machine-well-defined}
+				每个已定义机器操作$M\in\mathfrak{M}$都诱导唯一的空间机器操作$M^{\mathrm{sh}}$。
+			\end{proposition}
+			
+			\begin{proof}
+				由\cref{prop:machine-domain-shape-compatible}，$M$的定义域只依赖输入图形的空间结构。
+				因此若
+				$$
+				(A_1,\dots,A_{a(M)})\in\operatorname{Dom}(M^{\mathrm{sh}}),
+				$$
+				则任意选取有颜色实现$S_i\in\operatorname{Real}(A_i)$后，
+				$$
+				(S_1,\dots,S_{a(M)})\in\operatorname{Dom}(M).
+				$$
+				
+				又由\cref{thm:machine-shape-invariance}，若两组有颜色实现具有相同输入空间结构，
+				则机器操作输出的空间结构相同。
+				因而
+				$$
+				M^{\mathrm{sh}}(A_1,\dots,A_{a(M)})
+				$$
+				与所选有颜色实现无关，故空间机器操作良定义。
+				
+				最后，由于$\operatorname{Dom}(M^{\mathrm{sh}})$已经定义为$\operatorname{Dom}(M)$在$\operatorname{Sh}$下的像，
+				且每个输入空间结构的输出空间结构由上述规则唯一决定，
+				所以$M^{\mathrm{sh}}$唯一。
+			\end{proof}
+			
+			因此，所有有色机器都可以无歧义地下降到空间图形层面。
+			把这些诱导出的空间机器操作收集起来，便得到空间机器操作族。
+			
+			\begin{definition}[空间机器操作族]
+				定义
+				$$
+				\mathfrak{M}_{\mathrm{sh}}
+				=
+				\{M^{\mathrm{sh}}\mid M\in\mathfrak{M}\}
+				$$
+				为由$\mathfrak{M}$诱导的\textbf{空间机器操作族}。
+			\end{definition}
+			
+			\begin{proposition}[结晶与上色的空间机器操作]
+				对任意$\kappa,\lambda\in\mathbb{C}$，
+				$$
+				(\operatorname{Cry}_{\kappa})^{\mathrm{sh}}
+				=
+				(\operatorname{Cry}_{\lambda})^{\mathrm{sh}}.
+				$$
+				因此可将它们共同记为
+				$$
+				\operatorname{Cry}^{\mathrm{sh}}.
+				$$
+				此外，对任意$\kappa\in\mathbb{C}$，
+				$$
+				(\operatorname{Paint}_{\kappa})^{\mathrm{sh}}
+				=
+				\operatorname{id}_{\mathbb{S}_{\mathrm{sh}}}.
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				由\cref{prop:cry-color-independence}，结晶操作在空间结构层面的输出与颜色参数无关，
+				因此对任意$\kappa,\lambda\in\mathbb{C}$有
+				$$
+				(\operatorname{Cry}_{\kappa})^{\mathrm{sh}}
+				=
+				(\operatorname{Cry}_{\lambda})^{\mathrm{sh}}.
+				$$
+				
+				由\cref{prop:paint-color-independence}，上色操作不改变任何位置处的块类型，
+				因而其诱导的空间机器操作为恒等映射：
+				$$
+				(\operatorname{Paint}_{\kappa})^{\mathrm{sh}}
+				=
+				\operatorname{id}_{\mathbb{S}_{\mathrm{sh}}}.
+				$$
+			\end{proof}
+			
+			有了空间机器操作族后，可以完全在空间图形层面重复可制作性的闭包定义。
+			这一定义忽略所有颜色信息，只记录哪些空间结构可以由初始空间结构通过空间机器操作得到。
+			
+			\begin{definition}[空间可制作图形]
+				设$\mathcal{A}\subseteq\mathbb{S}_{\mathrm{sh}}$为初始空间图形集合。
+				定义由$\mathcal{A}$生成的\textbf{空间可制作图形集合}
+				$$
+				\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})
+				$$
+				为满足以下条件的最小子集$\mathcal{M}\subseteq\mathbb{S}_{\mathrm{sh}}$：
+				\begin{enumerate}
+					\item
+					$$
+					\mathcal{A}\subseteq\mathcal{M};
+					$$
+					
+					\item 对任意$M^{\mathrm{sh}}\in\mathfrak{M}_{\mathrm{sh}}$，若
+					$$
+					(A_1,\dots,A_{a(M^{\mathrm{sh}})})
+					\in
+					\operatorname{Dom}(M^{\mathrm{sh}})
+					\cap
+					\mathcal{M}^{a(M^{\mathrm{sh}})}
+					$$
+					且
+					$$
+					M^{\mathrm{sh}}(A_1,\dots,A_{a(M^{\mathrm{sh}})})
+					=
+					(B_1,\dots,B_{b(M^{\mathrm{sh}})}),
+					$$
+					则
+					$$
+					B_1,\dots,B_{b(M^{\mathrm{sh}})}\in\mathcal{M}.
+					$$
+				\end{enumerate}
+				
+				若$A\in\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})$，则称$A$从$\mathcal{A}$出发\textbf{空间可制作}。
+			\end{definition}
+			
+			与有颜色情形一样，空间可制作性也可以用带标签的空间制作路径来刻画。
+			空间制作路径与有颜色制作路径的区别仅在于：标签对应的对象是空间图形，使用的机器操作是空间机器操作。
+			
+			\begin{definition}[空间制作路径]
+				设$\mathcal{A}\subseteq\mathbb{S}_{\mathrm{sh}}$为初始空间图形集合。
+				一条从$\mathcal{A}$出发的\textbf{空间制作路径}由以下数据组成：
+				\begin{enumerate}
+					\item 一个自然数$n\in\mathbb{N}$；
+					\item 对每个$r=0,\dots,n$，一个有限标签集合$L_r$以及一个映射
+					$$
+					W_r:L_r\to\mathbb{S}_{\mathrm{sh}};
+					$$
+					\item 对每个$r=0,\dots,n-1$，一个空间机器操作
+					$$
+					M_r^{\mathrm{sh}}\in\mathfrak{M}_{\mathrm{sh}},
+					$$
+					一个输入标签元组
+					$$
+					\boldsymbol{\lambda}_r
+					=
+					(\lambda_{r,1},\dots,\lambda_{r,a(M_r^{\mathrm{sh}})})
+					\in L_r^{a(M_r^{\mathrm{sh}})},
+					$$
+					以及互不相同且不属于$L_r$的新输出标签
+					$$
+					\mu_{r,1},\dots,\mu_{r,b(M_r^{\mathrm{sh}})}.
+					$$
+				\end{enumerate}
+				这些数据要求满足：
+				\begin{enumerate}
+					\item 初始标签对应的空间图形来自$\mathcal{A}$，即
+					$$
+					W_0(L_0)\subseteq\mathcal{A}.
+					$$
+					
+					\item 对每个$r=0,\dots,n-1$，定义输入空间图形元组
+					$$
+					\mathbf{A}_r
+					=
+					\bigl(
+					W_r(\lambda_{r,1}),\dots,W_r(\lambda_{r,a(M_r^{\mathrm{sh}})})
+					\bigr).
+					$$
+					要求
+					$$
+					\mathbf{A}_r\in\operatorname{Dom}(M_r^{\mathrm{sh}}).
+					$$
+					若
+					$$
+					M_r^{\mathrm{sh}}(\mathbf{A}_r)
+					=
+					(B_{r,1},\dots,B_{r,b(M_r^{\mathrm{sh}})}),
+					$$
+					则
+					$$
+					L_{r+1}
+					=
+					L_r\cup\{\mu_{r,1},\dots,\mu_{r,b(M_r^{\mathrm{sh}})}\},
+					$$
+					并且$W_{r+1}:L_{r+1}\to\mathbb{S}_{\mathrm{sh}}$满足
+					$$
+					W_{r+1}|_{L_r}=W_r,
+					\qquad
+					W_{r+1}(\mu_{r,j})=B_{r,j}.
+					$$
+				\end{enumerate}
+				
+				若存在标签$\lambda\in L_n$使得
+				$$
+				W_n(\lambda)=A,
+				$$
+				则称空间制作路径\textbf{制作出}$A$。
+			\end{definition}
+			
+			\begin{proposition}[空间制作路径刻画空间可制作性]\label{prop:shape-make-path-characterization}
+				设$\mathcal{A}\subseteq\mathbb{S}_{\mathrm{sh}}$，$A\in\mathbb{S}_{\mathrm{sh}}$。
+				则
+				$$
+				A\in\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})
+				$$
+				当且仅当存在一条从$\mathcal{A}$出发并制作出$A$的空间制作路径。
+			\end{proposition}
+			
+			\begin{proof}
+				证明与\cref{prop:make-path-characterization}完全类似。
+				记$\mathcal{P}_{\mathcal{A}}$为所有可由从$\mathcal{A}$出发的空间制作路径制作出的空间图形集合。
+				
+				任意空间制作路径的初始标签对应的空间图形属于$\mathcal{A}$，每一步只将某个空间机器操作作用于已有标签所对应的空间图形，并把输出赋给新的标签。
+				因此所有空间制作路径产生的空间图形都属于任何包含$\mathcal{A}$并对$\mathfrak{M}_{\mathrm{sh}}$封闭的集合。
+				特别地，
+				$$
+				\mathcal{P}_{\mathcal{A}}
+				\subseteq
+				\operatorname{Make}_{\mathrm{sh}}(\mathcal{A}).
+				$$
+				
+				反过来，$\mathcal{P}_{\mathcal{A}}$包含$\mathcal{A}$：对任意$A\in\mathcal{A}$，取$n=0$、$L_0=\{\lambda\}$且$W_0(\lambda)=A$即可。
+				若空间图形$A_1,\dots,A_{a(M^{\mathrm{sh}})}$均属于$\mathcal{P}_{\mathcal{A}}$，且某个空间机器操作$M^{\mathrm{sh}}$作用于它们得到输出
+				$$
+				M^{\mathrm{sh}}(A_1,\dots,A_{a(M^{\mathrm{sh}})})
+				=
+				(B_1,\dots,B_{b(M^{\mathrm{sh}})}),
+				$$
+				则分别取制作出各$A_i$的空间制作路径，重命名标签使其两两不交，再依次拼接这些路径，最后追加一步$M^{\mathrm{sh}}$，即可得到制作出各$B_j$的空间制作路径。
+				因而$\mathcal{P}_{\mathcal{A}}$对所有空间机器操作封闭。
+				
+				由$\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})$的最小性，
+				$$
+				\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})
+				\subseteq
+				\mathcal{P}_{\mathcal{A}}.
+				$$
+				两个包含关系合起来即得结论。
+			\end{proof}
+			
+			下面证明有颜色制作与空间制作之间的第一个方向：
+			任何有颜色制作路径都可以逐步投影为一条空间制作路径。
+			因此，有颜色可制作图形的空间结构一定是空间可制作的。
+			
+			\begin{proposition}[可制作性的空间投影]\label{prop:make-shape-projection}
+				设$\mathcal{I}\subseteq\mathbb{S}$，并记
+				$$
+				\operatorname{Sh}(\mathcal{I})
+				=
+				\{\operatorname{Sh}(S)\mid S\in\mathcal{I}\}.
+				$$
+				若
+				$$
+				S\in\operatorname{Make}(\mathcal{I}),
+				$$
+				则
+				$$
+				\operatorname{Sh}(S)
+				\in
+				\operatorname{Make}_{\mathrm{sh}}(\operatorname{Sh}(\mathcal{I})).
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				由\cref{prop:make-path-characterization}，存在一条从$\mathcal{I}$出发并制作出$S$的制作路径。
+				设该制作路径的标签集合与赋值映射为
+				$$
+				L_r,\qquad V_r:L_r\to\mathbb{S},
+				\qquad r=0,\dots,n.
+				$$
+				并设第$r$步使用的机器操作为$M_r\in\mathfrak{M}$，输入标签元组为
+				$$
+				\boldsymbol{\lambda}_r
+				=
+				(\lambda_{r,1},\dots,\lambda_{r,a(M_r)}),
+				$$
+				输出标签为
+				$$
+				\mu_{r,1},\dots,\mu_{r,b(M_r)}.
+				$$
+				
+				对每个$r=0,\dots,n$，定义
+				$$
+				W_r:L_r\to\mathbb{S}_{\mathrm{sh}},
+				\qquad
+				W_r(\lambda)=\operatorname{Sh}(V_r(\lambda)).
+				$$
+				由于有颜色制作路径满足
+				$$
+				V_0(L_0)\subseteq\mathcal{I},
+				$$
+				故
+				$$
+				W_0(L_0)\subseteq\operatorname{Sh}(\mathcal{I}).
+				$$
+				因而投影后的初始标签满足空间制作路径的初始条件。
+				
+				下面检查每一步机器操作。
+				对每个$r=0,\dots,n-1$，令有颜色路径第$r$步的输入图形元组为
+				$$
+				\mathbf{S}_r
+				=
+				\bigl(
+				V_r(\lambda_{r,1}),\dots,V_r(\lambda_{r,a(M_r)})
+				\bigr).
+				$$
+				按制作路径定义，
+				$$
+				\mathbf{S}_r\in\operatorname{Dom}(M_r).
+				$$
+				记
+				$$
+				M_r(\mathbf{S}_r)
+				=
+				(T_{r,1},\dots,T_{r,b(M_r)}).
+				$$
+				
+				本文约定$\operatorname{Sh}$作用于元组时按分量作用，即
+				$$
+				\operatorname{Sh}(\mathbf{S}_r)
+				=
+				\bigl(
+				\operatorname{Sh}(V_r(\lambda_{r,1})),\dots,
+				\operatorname{Sh}(V_r(\lambda_{r,a(M_r)}))
+				\bigr).
+				$$
+				由空间机器操作定义，
+				$$
+				\operatorname{Sh}(\mathbf{S}_r)
+				\in
+				\operatorname{Dom}(M_r^{\mathrm{sh}}),
+				$$
+				并且
+				$$
+				M_r^{\mathrm{sh}}\bigl(\operatorname{Sh}(\mathbf{S}_r)\bigr)
+				=
+				\bigl(
+				\operatorname{Sh}(T_{r,1}),\dots,\operatorname{Sh}(T_{r,b(M_r)})
+				\bigr).
+				$$
+				
+				另一方面，由有颜色制作路径定义，
+				$$
+				V_{r+1}|_{L_r}=V_r,
+				\qquad
+				V_{r+1}(\mu_{r,j})=T_{r,j}
+				\quad(j=1,\dots,b(M_r)).
+				$$
+				因此
+				$$
+				W_{r+1}|_{L_r}=W_r,
+				$$
+				且
+				$$
+				W_{r+1}(\mu_{r,j})
+				=
+				\operatorname{Sh}(T_{r,j})
+				\quad(j=1,\dots,b(M_r)).
+				$$
+				这正说明：使用相同标签集合、相同输入标签元组、相同输出标签，以及空间机器操作
+				$$
+				M_r^{\mathrm{sh}}
+				$$
+				可以得到一条从$\operatorname{Sh}(\mathcal{I})$出发的空间制作路径。
+				
+				由于原制作路径制作出$S$，存在标签$\lambda\in L_n$使得
+				$$
+				V_n(\lambda)=S.
+				$$
+				于是对应空间制作路径满足
+				$$
+				W_n(\lambda)
+				=
+				\operatorname{Sh}(V_n(\lambda))
+				=
+				\operatorname{Sh}(S).
+				$$
+				因此该空间制作路径制作出$\operatorname{Sh}(S)$。
+				由\cref{prop:shape-make-path-characterization}，
+				$$
+				\operatorname{Sh}(S)
+				\in
+				\operatorname{Make}_{\mathrm{sh}}(\operatorname{Sh}(\mathcal{I})).
+				$$
+			\end{proof}
+			
+			反过来，任意空间制作路径也可以提升为某条有颜色制作路径。
+			为此，需要先为初始空间图形选择任意有颜色实现；之后每一步空间机器操作都选择一个诱导它的有颜色机器操作。
+			空间机器操作的良定义性保证了这样得到的有颜色输出具有指定的空间结构。
+			
+			\begin{proposition}[空间制作的有颜色实现]\label{prop:shape-make-realization}
+				设$\mathcal{A}\subseteq\mathbb{S}_{\mathrm{sh}}$。
+				对每个$A\in\mathcal{A}$，任取一个有颜色实现$S_A\in\operatorname{Real}(A)$，
+				并令
+				$$
+				\mathcal{I}
+				=
+				\{S_A\mid A\in\mathcal{A}\}.
+				$$
+				若
+				$$
+				B\in\operatorname{Make}_{\mathrm{sh}}(\mathcal{A}),
+				$$
+				则存在
+				$$
+				T\in\operatorname{Make}(\mathcal{I})
+				$$
+				使得
+				$$
+				\operatorname{Sh}(T)=B.
+				$$
+			\end{proposition}
+			
+			\begin{proof}
+				由\cref{prop:shape-make-path-characterization}，存在一条从$\mathcal{A}$出发并制作出$B$的空间制作路径。
+				设该空间制作路径的标签集合与赋值映射为
+				$$
+				L_r,\qquad W_r:L_r\to\mathbb{S}_{\mathrm{sh}},
+				\qquad r=0,\dots,n.
+				$$
+				并设第$r$步使用的空间机器操作为
+				$$
+				M_r^{\mathrm{sh}}\in\mathfrak{M}_{\mathrm{sh}},
+				$$
+				输入标签元组为
+				$$
+				\boldsymbol{\lambda}_r
+				=
+				(\lambda_{r,1},\dots,\lambda_{r,a(M_r^{\mathrm{sh}})}),
+				$$
+				输出标签为
+				$$
+				\mu_{r,1},\dots,\mu_{r,b(M_r^{\mathrm{sh}})}.
+				$$
+				
+				我们将归纳构造一条有颜色制作路径。
+				这条有颜色制作路径使用相同的标签集合$L_r$、相同的输入标签元组与输出标签。
+				其赋值映射记为
+				$$
+				V_r:L_r\to\mathbb{S},
+				$$
+				并要求对所有$r=0,\dots,n$和所有$\lambda\in L_r$都有
+				$$
+				\operatorname{Sh}(V_r(\lambda))=W_r(\lambda).
+				$$
+				
+				当$r=0$时，由空间制作路径定义，
+				$$
+				W_0(L_0)\subseteq\mathcal{A}.
+				$$
+				对每个$\lambda\in L_0$，取预先选定的有颜色实现
+				$$
+				V_0(\lambda)=S_{W_0(\lambda)}\in\mathcal{I}.
+				$$
+				则
+				$$
+				\operatorname{Sh}(V_0(\lambda))
+				=
+				\operatorname{Sh}(S_{W_0(\lambda)})
+				=
+				W_0(\lambda).
+				$$
+				因此归纳要求在$r=0$时成立。
+				
+				假设已经构造到第$r$步，即已经得到
+				$$
+				V_r:L_r\to\mathbb{S}
+				$$
+				并满足
+				$$
+				\operatorname{Sh}(V_r(\lambda))=W_r(\lambda)
+				\qquad(\lambda\in L_r).
+				$$
+				
+				空间路径第$r$步使用空间机器操作$M_r^{\mathrm{sh}}$。
+				由空间机器操作族定义，存在某个有颜色机器操作
+				$$
+				M_r\in\mathfrak{M}
+				$$
+				诱导$M_r^{\mathrm{sh}}$。
+				对于由结晶或上色诱导出的空间机器操作，任选一个颜色参数对应的有颜色机器操作即可。
+				于是
+				$$
+				a(M_r)=a(M_r^{\mathrm{sh}}),
+				\qquad
+				b(M_r)=b(M_r^{\mathrm{sh}}).
+				$$
+				
+				空间路径第$r$步的输入空间图形元组为
+				$$
+				\mathbf{A}_r
+				=
+				\bigl(
+				W_r(\lambda_{r,1}),\dots,
+				W_r(\lambda_{r,a(M_r^{\mathrm{sh}})})
+				\bigr),
+				$$
+				且
+				$$
+				\mathbf{A}_r\in\operatorname{Dom}(M_r^{\mathrm{sh}}).
+				$$
+				定义对应的有颜色输入图形元组为
+				$$
+				\mathbf{S}_r
+				=
+				\bigl(
+				V_r(\lambda_{r,1}),\dots,
+				V_r(\lambda_{r,a(M_r)})
+				\bigr).
+				$$
+				由归纳假设可知，$\operatorname{Sh}$逐项作用后有
+				$$
+				\operatorname{Sh}(\mathbf{S}_r)=\mathbf{A}_r.
+				$$
+				
+				由于$M_r$具有空间相容定义域，且
+				$$
+				\mathbf{A}_r\in\operatorname{Dom}(M_r^{\mathrm{sh}})
+				$$
+				意味着存在某组空间结构为$\mathbf{A}_r$的有颜色输入属于$\operatorname{Dom}(M_r)$，
+				因而当前选取的有颜色输入元组也满足
+				$$
+				\mathbf{S}_r\in\operatorname{Dom}(M_r).
+				$$
+				
+				令
+				$$
+				M_r(\mathbf{S}_r)
+				=
+				(T_{r,1},\dots,T_{r,b(M_r)}).
+				$$
+				由空间机器操作的定义，有
+				$$
+				M_r^{\mathrm{sh}}(\mathbf{A}_r)
+				=
+				\bigl(
+				\operatorname{Sh}(T_{r,1}),\dots,
+				\operatorname{Sh}(T_{r,b(M_r)})
+				\bigr).
+				$$
+				
+				另一方面，空间制作路径第$r$步满足
+				$$
+				M_r^{\mathrm{sh}}(\mathbf{A}_r)
+				=
+				(B_{r,1},\dots,B_{r,b(M_r^{\mathrm{sh}})}),
+				$$
+				且
+				$$
+				W_{r+1}(\mu_{r,j})=B_{r,j}.
+				$$
+				由于$b(M_r)=b(M_r^{\mathrm{sh}})$，故对每个$j$有
+				$$
+				\operatorname{Sh}(T_{r,j})=B_{r,j}.
+				$$
+				
+				现在定义
+				$$
+				V_{r+1}:L_{r+1}\to\mathbb{S}
+				$$
+				如下：
+				$$
+				V_{r+1}|_{L_r}=V_r,
+				\qquad
+				V_{r+1}(\mu_{r,j})=T_{r,j}
+				\quad(j=1,\dots,b(M_r)).
+				$$
+				则旧标签上的空间结构由归纳假设保持；
+				新输出标签上则有
+				$$
+				\operatorname{Sh}(V_{r+1}(\mu_{r,j}))
+				=
+				\operatorname{Sh}(T_{r,j})
+				=
+				B_{r,j}
+				=
+				W_{r+1}(\mu_{r,j}).
+				$$
+				因而对所有$\lambda\in L_{r+1}$都有
+				$$
+				\operatorname{Sh}(V_{r+1}(\lambda))=W_{r+1}(\lambda).
+				$$
+				
+				由归纳法，得到一条从$\mathcal{I}$出发的有颜色制作路径，其每个标签对应图形的空间结构都等于给定空间路径中同一标签对应的空间图形。
+				
+				由于空间制作路径制作出$B$，存在$\lambda\in L_n$使得
+				$$
+				W_n(\lambda)=B.
+				$$
+				令
+				$$
+				T=V_n(\lambda).
+				$$
+				则由构造，
+				$$
+				\operatorname{Sh}(T)
+				=
+				\operatorname{Sh}(V_n(\lambda))
+				=
+				W_n(\lambda)
+				=
+				B.
+				$$
+				又该有颜色路径从$\mathcal{I}$出发制作出$T$，由\cref{prop:make-path-characterization}可知
+				$$
+				T\in\operatorname{Make}(\mathcal{I}).
+				$$
+				结论成立。
+			\end{proof}
+			
+			上述两个命题分别给出了有颜色制作到空间制作的投影，以及空间制作到有颜色制作的实现。
+			把这两个方向合起来，可以得到有颜色制作系统与空间制作系统之间的精确对应关系。
 			
 			\begin{corollary}[可制作图形的空间闭包]\label{cor:make-shape-closure}
 				设$\mathcal{I}\subseteq\mathbb{S}$。
@@ -3687,8 +3889,46 @@
 			\end{corollary}
 			
 			\begin{proof}
-				由\cref{prop:make-shape-projection,prop:shape-make-realization}可得两个方向的包含关系。
+				由\cref{prop:make-shape-projection}得
+				$$
+				\operatorname{Sh}(\operatorname{Make}(\mathcal{I}))
+				\subseteq
+				\operatorname{Make}_{\mathrm{sh}}(\operatorname{Sh}(\mathcal{I}))
+				=
+				\operatorname{Make}_{\mathrm{sh}}(\mathcal{A}).
+				$$
+				由\cref{prop:shape-make-realization}得反向包含。
 			\end{proof}
+			
+			因此，空间可制作性正是有颜色可制作性在空间结构映射$\operatorname{Sh}$下的投影。
+			后续若只关心图形的空间结构，可以完全在空间机器系统中工作；
+			而一旦需要回到有颜色图形，只需为初始空间图形选定有颜色实现，即可由上述对应关系得到相应的有颜色制作结果。
+			
+			\begin{definition}[空间单位元集合]
+				定义
+				$$
+				\mathcal{E}_{\mathrm{ent}}^{\mathrm{sh}}
+				=
+				\operatorname{Sh}(\mathcal{E}_{\mathrm{ent}}),
+				\qquad
+				\mathcal{E}_{P}^{\mathrm{sh}}
+				=
+				\operatorname{Sh}(\mathcal{E}_{P}),
+				$$
+				以及
+				$$
+				\mathcal{E}_{\mathrm{std}}^{\mathrm{sh}}
+				=
+				\operatorname{Sh}(\mathcal{E}_{\mathrm{std}})
+				=
+				\mathcal{E}_{\mathrm{ent}}^{\mathrm{sh}}
+				\cup
+				\mathcal{E}_{P}^{\mathrm{sh}}.
+				$$
+				分别称为普通实体空间单位元集合、顶针空间单位元集合和标准空间单位元集合。
+			\end{definition}
+			
+			后续研究紧图形的空间可制作性时，将主要以这些空间单位元集合作为初始空间图形集合。
 			
 	\section{紧图形的空间可制作性}
 		\subsection{紧图形与象限分解}
