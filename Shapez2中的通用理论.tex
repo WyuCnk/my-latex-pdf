@@ -14,6 +14,9 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 
+\usepackage{longtable}
+\usepackage{array}
+
 % TikZ
 \usepackage{tikz}
 \usetikzlibrary{positioning, arrows.meta, calc}
@@ -69,6 +72,127 @@
 	\end{abstract}
 	
 	\tableofcontents
+	
+	\section*{符号表}
+	\addcontentsline{toc}{section}{符号表}
+	
+	\begin{longtable}{>{\raggedright\arraybackslash}p{0.25\textwidth}
+			>{\raggedright\arraybackslash}p{0.67\textwidth}}
+		\textbf{符号} & \textbf{含义}\\
+		\hline
+		\endfirsthead
+		
+		\textbf{符号} & \textbf{含义}\\
+		\hline
+		\endhead
+		
+		\multicolumn{2}{l}{\textbf{块与图形}}\\
+		\hline
+		$\mathbb{T}$ & 普通实体类型集合，例如$C,R,S,W,X,Y$等。\\
+		$\mathbb{T}_{\mathrm{blk}}$ & 块类型集合，$\mathbb{T}_{\mathrm{blk}}=\{-,P,c\}\cup\mathbb{T}$。\\
+		$\mathbb{C}$ & 实际颜色集合，例如$r,g,b,y,m,c,w,k,u$等。\\
+		$\mathbb{C}_{\mathrm{blk}}$ & 颜色记号集合，$\mathbb{C}_{\mathrm{blk}}=\{-\}\cup\mathbb{C}$。\\
+		$\mathbb{B}$ & 合法块集合，$\{(-,-)\}\cup(\mathbb{T}\times\mathbb{C})\cup(\{c\}\times\mathbb{C})\cup\{(P,-)\}$。\\
+		$\mathbf{0}$ & 空块，$\mathbf{0}=(-,-)$。\\
+		$S$ & 一个有颜色图形。\\
+		$\mathbb{S}$ & 所有有颜色图形构成的集合。\\
+		$\operatorname{ht}(S)$ & 图形$S$的高度。\\
+		$\operatorname{wd}(S)$ & 图形$S$的宽度。\\
+		$I_S$ & 图形$S$的位置集合。\\
+		$S_p$ & 图形$S$在位置$p$处的块。\\
+		$\tau_p$ & 位置$p$处块的类型。\\
+		$\chi_p$ & 位置$p$处块的颜色记号。\\
+		$U_S$ & 图形$S$中的非空位置集合。\\
+		$C_S$ & 图形$S$中的晶体位置集合。\\
+		$S\setminus A$ & 将$S$中位置集合$A$上的块置空后得到的图形。\\
+		
+		\multicolumn{2}{l}{\textbf{粘连、支撑与下落}}\\
+		\hline
+		$\mathbb{A}$ & 可参与粘连的类型集合，$\mathbb{A}=\mathbb{T}\cup\{c\}$。\\
+		$p\sim_S q$ & 位置$p$与$q$在$S$中直接粘连。\\
+		$p\equiv_S q$ & 位置$p$与$q$在$S$中粘连连通。\\
+		$\mathcal{G}(S)$ & 图形$S$中的最大粘连组集合。\\
+		$[p]_S$ & 位置$p$所在的最大粘连组。\\
+		$p\preceq_S q$ & 位置$p$处块支撑位置$q$处块。\\
+		$G\preceq_S H$ & 最大粘连组$G$支撑最大粘连组$H$。\\
+		$\Gamma_S$ & 图形$S$的支撑图。\\
+		$G\to_S H$ & 支撑图中$G$直接支撑$H$。\\
+		$G\leadsto_S H$ & 存在从$G$到$H$的支撑路径。\\
+		$\mathcal{P}$ & 当前下落过程中的下落组划分。\\
+		$G^\downarrow$ & 下落组$G$整体下移一层后的目标位置集合。\\
+		$G\to_{S,\mathcal{P}}H$ & 下落组$G$在状态$(S,\mathcal{P})$中动态支撑$H$。\\
+		$\Phi_G(S)$ & 下落组$G$在$S$中执行一次下落后的图形。\\
+		$\operatorname{Succ}_S(G)$ & 下落组$G$一次下落后产生的后继组集合。\\
+		$\omega$ & 队列规则。\\
+		$\Sigma=(S,\mathcal{P},Q,f)$ & 下落状态。\\
+		$\operatorname{Fall}_\omega(S)$ & 队列规则$\omega$诱导的全局下落结果。\\
+		$\operatorname{Fall}(S)$ & 队列无关的全局下落结果。\\
+		$\mathbb{S}_{\mathrm{st}}$ & 所有稳定图形构成的集合。\\
+		$\mathcal{B}_S$ & 初始图形$S$中的触地组集合。\\
+		$\Theta_S$ & 支撑闭包算子。\\
+		$\mu\Theta_S$ & 支撑闭包算子的最小不动点。\\
+		$\nu\Theta_S$ & 支撑闭包算子的最大不动点。\\
+		$\mathcal{Z}_S$ & 图形$S$的循环支撑核。\\
+		$\mathcal{N}(S)$ & 静态不可下落初始组集合，$\mathcal{N}(S)=\nu\Theta_S$。\\
+		$\mathcal{F}(S)$ & 静态可下落初始组集合，$\mathcal{G}(S)\setminus\mathcal{N}(S)$。\\
+		$\operatorname{Fall}_{\mathrm{st}}(S)$ & 静态下落过程得到的图形。\\
+		
+		\multicolumn{2}{l}{\textbf{晶体机制}}\\
+		\hline
+		$p\sim_S^c q$ & 晶体位置$p$与$q$上下左右相邻。\\
+		$p\equiv_S^c q$ & 晶体位置$p$与$q$晶体连通。\\
+		$\mathcal{C}(S)$ & 图形$S$中的晶体簇集合。\\
+		$[p]_S^c$ & 晶体位置$p$所在的晶体簇。\\
+		$\operatorname{Br}_p(S)$ & 位置$p$处晶体破碎后的图形。\\
+		$O_\ell(S)$ & 高度上限$\ell$下的超上限区域。\\
+		$X_\ell(S)$ & 超上限区域触发破碎的晶体位置集合。\\
+		$\operatorname{Clip}_\ell(S)$ & 高度上限$\ell$下的超上限删除结果。\\
+		
+		\multicolumn{2}{l}{\textbf{机器操作}}\\
+		\hline
+		$\operatorname{Rot}_k$ & 顺时针旋转$k$个象限的操作。\\
+		$I_S^{\mathrm W},I_S^{\mathrm E}$ & 图形$S$的西半边、东半边位置集合。\\
+		$S|_A$ & 图形$S$在位置集合$A$上的保留图形。\\
+		$S\sqcup T$ & 由$S$的西半边与$T$的东半边拼接得到的图形。\\
+		$B_{\mathrm{cut}}(S)$ & 切割直接触发的晶体位置集合。\\
+		$X_{\mathrm{cut}}(S)$ & 切割触发破碎的全部晶体位置集合。\\
+		$\operatorname{Cut}(S)$ & 切割操作输出的有序对。\\
+		$\operatorname{Cut}_{\mathrm W}(S)$ & 切割后的西半边输出。\\
+		$\operatorname{Cut}_{\mathrm E}(S)$ & 切割后的东半边输出。\\
+		$\operatorname{Half}(S)$ & 半破操作结果。\\
+		$\operatorname{Swap}(S,T)$ & 交换操作结果。\\
+		$S\mathbin{\Box}T$ & 将$S$置于$T$上方并插入一层空层的上下拼接图形。\\
+		$\operatorname{Stack}_\ell(S,T)$ & 高度上限$\ell$下的堆叠操作结果。\\
+		$\operatorname{Cry}_\kappa(S)$ & 以颜色$\kappa$执行结晶后的图形。\\
+		$\operatorname{Paint}_\kappa(S)$ & 以颜色$\kappa$执行上色后的图形。\\
+		$\mathfrak{M}$ & 所有有颜色机器操作构成的机器操作族。\\
+		
+		\multicolumn{2}{l}{\textbf{空间结构}}\\
+		\hline
+		$A$ & 一个空间图形。\\
+		$\mathbb{S}_{\mathrm{sh}}$ & 所有空间图形构成的集合。\\
+		$\operatorname{Sh}(S)$ & 图形$S$的空间结构。\\
+		$S\equiv_{\mathrm{sh}}T$ & 图形$S$与$T$具有相同空间结构。\\
+		$\operatorname{Real}(A)$ & 空间图形$A$的所有有颜色实现。\\
+		$M^{\mathrm{sh}}$ & 机器操作$M$诱导的空间机器操作。\\
+		$\mathfrak{M}_{\mathrm{sh}}$ & 空间机器操作族。\\
+		$\operatorname{Cry}^{\mathrm{sh}}$ & 结晶操作诱导的空间机器操作。\\
+		
+		\multicolumn{2}{l}{\textbf{可制作性}}\\
+		\hline
+		$\operatorname{Make}(\mathcal{I})$ & 从初始有颜色图形集合$\mathcal{I}$出发生成的可制作图形集合。\\
+		$\mathcal{E}_{\mathrm{ent}}$ & 普通实体单位元集合。\\
+		$\mathcal{E}_{P}$ & 顶针单位元集合。\\
+		$\mathcal{E}_{\mathrm{std}}$ & 标准制作单位元集合。\\
+		$L_r$ & 制作路径第$r$步的有限标签集合。\\
+		$V_r$ & 有颜色制作路径中标签到图形的赋值映射。\\
+		$W_r$ & 空间制作路径中标签到空间图形的赋值映射。\\
+		$\operatorname{Make}_{\mathrm{sh}}(\mathcal{A})$ & 从初始空间图形集合$\mathcal{A}$出发生成的空间可制作图形集合。\\
+		$\mathcal{E}_{\mathrm{ent}}^{\mathrm{sh}}$ & 普通实体空间单位元集合。\\
+		$\mathcal{E}_{P}^{\mathrm{sh}}$ & 顶针空间单位元集合。\\
+		$\mathcal{E}_{\mathrm{std}}^{\mathrm{sh}}$ & 标准空间单位元集合。\\
+		
+	\end{longtable}
 	
 	\section{基础机制}
 	
